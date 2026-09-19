@@ -110,6 +110,11 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
     }
 
     function onMove(e: PointerEvent) {
+      // re-cache every move (cheap for 8 spans) rather than trusting a
+      // one-time measurement — the entrance animation slides these letters
+      // up into place well after fonts.ready fires, so a stale cache made
+      // the hitbox track where the letters used to be, not where they are.
+      cacheCenters();
       const mx = e.clientX;
       const my = e.clientY;
       for (const c of chars) {
@@ -143,6 +148,7 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
         const rect = hostEl.getBoundingClientRect();
         const focalX = rect.left + wave * rect.width;
         const focalY = rect.top + rect.height / 2;
+        cacheCenters();
         for (const c of chars) {
           const dx = focalX - c.cx;
           const dy = focalY - c.cy;
