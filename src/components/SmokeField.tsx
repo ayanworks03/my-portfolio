@@ -1,14 +1,25 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+// The reveal boundary is computed per-pixel in-shader (not a CSS mask), so
+// it can be distorted by the same noise driving the smoke itself — the
+// edge reads as cloud/smoke pulling back rather than a hard geometric
+// circle, while still following the cursor smoothly.
+const CANVAS_SCALE = 0.55;
+const BASE_RADIUS = 260 * CANVAS_SCALE; // canvas px, roughly matches the old mask's size
+const EDGE_SOFTNESS = 70 * CANVAS_SCALE; // canvas px width of the soft transition band
+const RADIUS_NOISE_AMOUNT = 0.55; // how much the boundary bulges/recedes (fraction of BASE_RADIUS)
+const AMBIENT_REVEAL = 0.1; // baseline visibility with the spotlight far away
+
 const FRAGMENT_SHADER = `
 precision mediump float;
-uniform float uTime; uniform vec2 uRes;
+uniform float uTime; uniform vec2 uRes; uniform vec2 uFocal;
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
   return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x), u.y); }
 float fbm(vec2 p){ float v=0.0; float a=0.5;
   for(int i=0;i<5;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
+
 void main(){
   vec2 p = (gl_FragCoord.xy - 0.5*uRes.xy)/uRes.y;
   float t = uTime*0.05;
@@ -19,7 +30,17 @@ void main(){
   col = mix(col, vec3(0.06,0.22,0.28), smoothstep(0.0,0.4,dens));
   col = mix(col, vec3(0.16,0.60,0.66), smoothstep(0.35,0.75,dens));
   col = mix(col, vec3(0.62,0.95,0.96), smoothstep(0.72,1.0,dens)*0.85);
-  gl_FragColor = vec4(col,1.0);
+
+  // organic, slowly-drifting distortion of the reveal boundary so it reads
+  // as smoke pulling back rather than a compass-drawn circle.
+  float edgeNoise = fbm(gl_FragCoord.xy * 0.012 + vec2(uTime*0.12, -uTime*0.09));
+  float effectiveRadius = ${BASE_RADIUS.toFixed(2)} * (1.0 - ${RADIUS_NOISE_AMOUNT.toFixed(2)} * 0.5 + ${RADIUS_NOISE_AMOUNT.toFixed(2)} * edgeNoise);
+  float d = distance(gl_FragCoord.xy, uFocal);
+  float reveal = 1.0 - smoothstep(effectiveRadius - ${EDGE_SOFTNESS.toFixed(2)}, effectiveRadius + ${EDGE_SOFTNESS.toFixed(2)}, d);
+  reveal = max(reveal, ${AMBIENT_REVEAL.toFixed(3)});
+
+  vec3 dark = vec3(0.027,0.035,0.047);
+  gl_FragColor = vec4(mix(dark, col, reveal), 1.0);
 }
 `;
 
@@ -48,7 +69,11 @@ export default function SmokeField() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const uniforms = { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } };
+    const uniforms = {
+      uTime: { value: 0 },
+      uRes: { value: new THREE.Vector2(1, 1) },
+      uFocal: { value: new THREE.Vector2(0, 0) },
+    };
 
     const mat = new THREE.ShaderMaterial({
       uniforms,
@@ -63,7 +88,6 @@ export default function SmokeField() {
     let sx = px;
     let sy = py;
     let active = false;
-    const RADIUS = 260;
 
     const onMove = (e: PointerEvent) => {
       px = e.clientX;
@@ -79,8 +103,8 @@ export default function SmokeField() {
     const resize = () => {
       const w = host.clientWidth || window.innerWidth;
       const h = host.clientHeight || window.innerHeight;
-      renderer.setSize(Math.round(w * 0.55), Math.round(h * 0.55), false);
-      uniforms.uRes.value.set(Math.round(w * 0.55), Math.round(h * 0.55));
+      renderer.setSize(Math.round(w * CANVAS_SCALE), Math.round(h * CANVAS_SCALE), false);
+      uniforms.uRes.value.set(Math.round(w * CANVAS_SCALE), Math.round(h * CANVAS_SCALE));
       cvs.style.width = '100%';
       cvs.style.height = '100%';
     };
@@ -105,15 +129,8 @@ export default function SmokeField() {
       sx += (px - sx) * follow;
       sy += (py - sy) * follow;
 
-      // dim, dark ambient base everywhere; a soft, low-alpha halo around the
-      // cursor reveals the full-strength smoke colour underneath, like a
-      // flashlight through fog rather than an added light source
-      const r = RADIUS;
-      const m =
-        `radial-gradient(circle ${r}px at ${sx.toFixed(0)}px ${sy.toFixed(0)}px, ` +
-        'rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0.22) 88%, rgba(0,0,0,0.1) 100%)';
-      host.style.webkitMaskImage = m;
-      host.style.maskImage = m;
+      // convert CSS/viewport pixels to the renderer's half-res, bottom-origin canvas space
+      uniforms.uFocal.value.set(sx * CANVAS_SCALE, (window.innerHeight - sy) * CANVAS_SCALE);
 
       if (now - last < FRAME) return;
       last = now;
