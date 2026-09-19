@@ -216,10 +216,18 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
           style={{
             display: 'inline-block',
             textAlign: 'center',
-            willChange: 'font-variation-settings, color, text-shadow',
+            willChange: 'font-variation-settings, color, text-shadow, opacity, transform',
             fontVariationSettings: "'wght' 100",
             color: 'rgba(233,237,242,0.5)',
             minWidth: ch === ' ' ? '0.34em' : undefined,
+            // matches the hidden state useScrollMotion's gsap.set() applies
+            // once `ready` flips — without this, the letters render fully
+            // visible for a moment (their default state), then the loader
+            // finishes and gsap.set() snaps them invisible, then gsap.to()
+            // fades them back in: a visible "flash, vanish, reappear". Only
+            // opacity is pre-set (not transform) — gsap needs to own the
+            // transform from a clean slate to track yPercent correctly.
+            opacity: 0,
           }}
         >
           {ch === ' ' ? ' ' : ch}
