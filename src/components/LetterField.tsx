@@ -5,6 +5,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 // the site's existing Roboto Flex / teal palette.
 const R = 300; // px radius of cursor influence around each glyph
 const EASE = 0.12; // per-frame interpolation toward target weight
+const DRAG = 0.09; // per-frame interpolation of the focal point toward the raw cursor — lower = more trailing "drag"
 const MIN_WEIGHT = 100;
 const MAX_WEIGHT = 900;
 const SETTLE_EPS = 0.5; // stop the rAF loop once every glyph is this close to target
@@ -73,14 +74,52 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
       cacheCenters();
     }
 
-    function step() {
+    // Raw pointer position (updated instantly on pointermove) vs. the focal
+    // point actually used to drive the effect (fx, fy), which drags behind
+    // the raw position with its own inertia — this is what gives the
+    // "liquid trail" feel instead of the bold spot snapping straight to
+    // the cursor every frame.
+    let mx = 0;
+    let my = 0;
+    let fx = 0;
+    let fy = 0;
+    let active = false;
+    let sweepStart: number | null = null;
+
+    function step(now: number) {
+      // 1) advance the focal point for this frame.
+      if (sweeping) {
+        if (sweepStart === null) sweepStart = now;
+        const elapsed = (now - sweepStart) % SWEEP_DURATION_MS;
+        const phase = elapsed / SWEEP_DURATION_MS;
+        const wave = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2;
+        const rect = hostEl.getBoundingClientRect();
+        fx = rect.left + wave * rect.width;
+        fy = rect.top + rect.height / 2;
+      } else if (active) {
+        fx += (mx - fx) * DRAG;
+        fy += (my - fy) * DRAG;
+      }
+
+      // 2) drive every glyph's target weight from the (possibly lagging)
+      // focal point, then ease its current weight toward that target.
       let allSettled = true;
       for (const c of chars) {
+        let t = 0;
+        if (sweeping || active) {
+          const dx = fx - c.cx;
+          const dy = fy - c.cy;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          t = Math.max(0, Math.min(1, 1 - d / R));
+          t = t * t;
+        }
+        c.t = t;
+        c.target = MIN_WEIGHT + t * (MAX_WEIGHT - MIN_WEIGHT);
+
         c.current += (c.target - c.current) * EASE;
         if (Math.abs(c.target - c.current) > SETTLE_EPS) allSettled = false;
         c.el.style.fontVariationSettings = "'wght' " + c.current.toFixed(1);
 
-        const t = c.t;
         c.el.style.color = `rgba(233,237,242,${(0.5 + t * 0.5).toFixed(3)})`;
         const glow = (16 * t).toFixed(1);
         const glow2 = (36 * t).toFixed(1);
@@ -91,11 +130,11 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
       }
 
       if (dead) return;
-      if (sweeping) {
-        raf = requestAnimationFrame(step);
-        return;
-      }
-      if (!allSettled) {
+      // the focal point itself may still be dragging toward mx/my even once
+      // every glyph's weight is momentarily settled, so keep going until
+      // it's caught up too (sweep mode never settles at all).
+      const focalSettled = !active || (Math.abs(mx - fx) < 1 && Math.abs(my - fy) < 1);
+      if (sweeping || !allSettled || !focalSettled) {
         raf = requestAnimationFrame(step);
       } else {
         looping = false;
@@ -110,51 +149,19 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
     }
 
     function onMove(e: PointerEvent) {
-      const mx = e.clientX;
-      const my = e.clientY;
-      for (const c of chars) {
-        const dx = mx - c.cx;
-        const dy = my - c.cy;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        let t = Math.max(0, Math.min(1, 1 - d / R));
-        t = t * t;
-        c.t = t;
-        c.target = MIN_WEIGHT + t * (MAX_WEIGHT - MIN_WEIGHT);
+      mx = e.clientX;
+      my = e.clientY;
+      if (!active) {
+        active = true;
+        fx = mx;
+        fy = my;
       }
       ensureLoop();
     }
 
     function onLeave() {
-      chars.forEach((c) => {
-        c.target = MIN_WEIGHT;
-        c.t = 0;
-      });
+      active = false;
       ensureLoop();
-    }
-
-    function runSweep() {
-      let startTime: number | null = null;
-      const frame = (now: number) => {
-        if (dead) return;
-        if (startTime === null) startTime = now;
-        const elapsed = (now - startTime) % SWEEP_DURATION_MS;
-        const phase = elapsed / SWEEP_DURATION_MS;
-        const wave = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2;
-        const rect = hostEl.getBoundingClientRect();
-        const focalX = rect.left + wave * rect.width;
-        const focalY = rect.top + rect.height / 2;
-        for (const c of chars) {
-          const dx = focalX - c.cx;
-          const dy = focalY - c.cy;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          let t = Math.max(0, Math.min(1, 1 - d / R));
-          t = t * t;
-          c.t = t;
-          c.target = MIN_WEIGHT + t * (MAX_WEIGHT - MIN_WEIGHT);
-        }
-        raf = requestAnimationFrame(frame);
-      };
-      raf = requestAnimationFrame(frame);
     }
 
     let resizeTimer = 0;
@@ -172,7 +179,7 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
         document.addEventListener('mouseleave', onLeave);
       } else {
         sweeping = true;
-        runSweep();
+        ensureLoop();
       }
     });
 
