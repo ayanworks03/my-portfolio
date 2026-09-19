@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import './App.css';
 import Loader from './components/Loader';
 import SmokeField from './components/SmokeField';
@@ -8,19 +8,34 @@ import Ethos from './components/Ethos';
 import Work from './components/Work';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import ThemeSwitcher from './components/ThemeSwitcher';
+import CustomCursor from './components/CustomCursor';
 import { useScrollMotion } from './hooks/useScrollMotion';
+import { loadTheme, saveTheme, type Theme } from './theme';
 
 export default function App() {
   const [ready, setReady] = useState(false);
+  const [theme, setTheme] = useState<Theme>(loadTheme);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
 
   useScrollMotion(headlineRef, ready);
 
+  // useLayoutEffect (not useEffect): the whole tree's layout effects finish
+  // before ANY component's passive effects run, so this is guaranteed to
+  // set the CSS variables before SmokeField's own (passive) effect reads
+  // them to re-sync the shader's accent uniform — with plain useEffect,
+  // child-before-parent ordering meant SmokeField read the stale value.
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    saveTheme(theme);
+  }, [theme]);
+
   return (
     <div style={{ position: 'relative', background: 'var(--bg)', overflowX: 'hidden' }}>
       <Loader onDone={() => setReady(true)} />
+      <CustomCursor />
 
-      <SmokeField />
+      <SmokeField theme={theme} />
       <div
         style={{
           position: 'fixed',
@@ -38,6 +53,8 @@ export default function App() {
       <Work />
       <Contact />
       <Footer />
+
+      <ThemeSwitcher theme={theme} onChange={setTheme} />
     </div>
   );
 }

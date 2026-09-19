@@ -28,7 +28,7 @@ export default function Work() {
               aspectRatio: '21/9',
               position: 'relative',
               background:
-                'radial-gradient(70% 120% at 20% 0%, rgba(95,212,214,0.16), rgba(10,14,20,0) 60%),repeating-linear-gradient(90deg,#141b25 0px,#141b25 1px,transparent 1px,transparent 54px),repeating-linear-gradient(0deg,#141b25 0px,#141b25 1px,transparent 1px,transparent 54px)',
+                'radial-gradient(70% 120% at 20% 0%, rgba(var(--accent-rgb),0.16), rgba(10,14,20,0) 60%),repeating-linear-gradient(90deg,#141b25 0px,#141b25 1px,transparent 1px,transparent 54px),repeating-linear-gradient(0deg,#141b25 0px,#141b25 1px,transparent 1px,transparent 54px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -58,7 +58,7 @@ export default function Work() {
               justifyContent: 'center',
               gap: 10,
               padding: '26px 20px 0',
-              background: 'linear-gradient(180deg,rgba(95,212,214,0.1),rgba(10,14,20,0))',
+              background: 'linear-gradient(180deg,rgba(var(--accent-rgb),0.1),rgba(10,14,20,0))',
               borderBottom: '1px solid var(--border)',
             }}
           >

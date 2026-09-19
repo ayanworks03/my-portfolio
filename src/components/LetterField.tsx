@@ -87,7 +87,7 @@ const LetterField = forwardRef<HTMLHeadingElement, { text: string }>(function Le
         c.el.style.textShadow =
           t < 0.02
             ? 'none'
-            : `0 0 ${glow}px rgba(233,237,242,${(0.5 * t).toFixed(3)}), 0 0 ${glow2}px rgba(95,212,214,${(0.4 * t).toFixed(3)})`;
+            : `0 0 ${glow}px rgba(233,237,242,${(0.5 * t).toFixed(3)}), 0 0 ${glow2}px rgba(var(--accent-rgb),${(0.4 * t).toFixed(3)})`;
       }
 
       if (dead) return;

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import type { Theme } from '../theme';
 
 // The reveal boundary is computed per-pixel in-shader (not a CSS mask), so
 // it can be distorted by the same noise driving the smoke itself — the
@@ -13,7 +14,7 @@ const AMBIENT_REVEAL = 0.1; // baseline visibility with the spotlight far away
 
 const FRAGMENT_SHADER = `
 precision mediump float;
-uniform float uTime; uniform vec2 uRes; uniform vec2 uFocal;
+uniform float uTime; uniform vec2 uRes; uniform vec2 uFocal; uniform vec3 uAccent;
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
   return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x), u.y); }
@@ -30,10 +31,15 @@ void main(){
   vec2 w = vec2(fbm(p*1.0 + vec2(t, -t*0.7)), fbm(p*1.0 + vec2(5.2 - t*0.6, 1.3 + t*0.4)));
   float f = fbm(p*1.3 + 2.1*w);
   float dens = smoothstep(0.0, 0.85, f);
+  // low/mid/bright stops derived from the theme's single accent colour, so
+  // every theme gets the same dark-to-glowing progression automatically.
+  vec3 low = uAccent * 0.34;
+  vec3 mid = uAccent * 0.92;
+  vec3 bright = mix(uAccent, vec3(1.0), 0.62);
   vec3 col = vec3(0.02,0.026,0.035);
-  col = mix(col, vec3(0.06,0.22,0.28), smoothstep(0.0,0.4,dens));
-  col = mix(col, vec3(0.16,0.60,0.66), smoothstep(0.35,0.75,dens));
-  col = mix(col, vec3(0.62,0.95,0.96), smoothstep(0.72,1.0,dens)*0.85);
+  col = mix(col, low, smoothstep(0.0,0.4,dens));
+  col = mix(col, mid, smoothstep(0.35,0.75,dens));
+  col = mix(col, bright, smoothstep(0.72,1.0,dens)*0.85);
 
   // organic, slowly-drifting distortion of the reveal boundary so it reads
   // as smoke pulling back rather than a compass-drawn circle.
@@ -50,8 +56,30 @@ void main(){
 
 const VERTEX_SHADER = 'void main(){ gl_Position = vec4(position.xy,0.0,1.0); }';
 
-export default function SmokeField() {
+// reads the *current* --accent-rgb custom property off <html> (set by
+// index.css's [data-theme] blocks) so the shader never needs its own copy
+// of each theme's colour values.
+function readAccentRgb(): [number, number, number] {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb');
+  const parts = raw.split(',').map((n) => parseFloat(n.trim()) / 255);
+  if (parts.length === 3 && parts.every((n) => Number.isFinite(n))) {
+    return [parts[0], parts[1], parts[2]];
+  }
+  return [0.373, 0.831, 0.839]; // teal fallback
+}
+
+export default function SmokeField({ theme }: { theme: Theme }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const accentUniformRef = useRef<{ value: THREE.Vector3 } | null>(null);
+
+  // re-sync the shader's accent colour whenever the theme changes, without
+  // tearing down and rebuilding the whole WebGL context.
+  useEffect(() => {
+    const u = accentUniformRef.current;
+    if (!u) return;
+    const [r, g, b] = readAccentRgb();
+    u.value.set(r, g, b);
+  }, [theme]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -73,11 +101,14 @@ export default function SmokeField() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const [ar, ag, ab] = readAccentRgb();
     const uniforms = {
       uTime: { value: 0 },
       uRes: { value: new THREE.Vector2(1, 1) },
       uFocal: { value: new THREE.Vector2(0, 0) },
+      uAccent: { value: new THREE.Vector3(ar, ag, ab) },
     };
+    accentUniformRef.current = uniforms.uAccent;
 
     const mat = new THREE.ShaderMaterial({
       uniforms,
@@ -145,6 +176,7 @@ export default function SmokeField() {
 
     return () => {
       dead = true;
+      accentUniformRef.current = null;
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
       document.removeEventListener('mouseleave', onLeave);

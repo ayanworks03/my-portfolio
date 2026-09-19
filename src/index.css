@@ -2,6 +2,7 @@
   --bg: #07090c;
   --fg: #e9edf2;
   --accent: #5fd4d6;
+  --accent-rgb: 95, 212, 214;
   --accent-hover: #8ae6e7;
   --muted: #a7aeb9;
   --muted-2: #8b939e;
@@ -10,6 +11,23 @@
   --border-2: #2b3340;
   --border-3: #33414f;
   --card-bg: #0a0e14;
+}
+
+/* teal is the default (:root) palette above — these are the other three */
+:root[data-theme='violet'] {
+  --accent: #a78bfa;
+  --accent-rgb: 167, 139, 250;
+  --accent-hover: #c4b5fd;
+}
+:root[data-theme='amber'] {
+  --accent: #ffb454;
+  --accent-rgb: 255, 180, 84;
+  --accent-hover: #ffcb85;
+}
+:root[data-theme='rose'] {
+  --accent: #ff6fa8;
+  --accent-rgb: 255, 111, 168;
+  --accent-hover: #ff96c1;
 }
 
 * {
@@ -80,4 +98,37 @@ html.lenis body {
   position: relative;
   background: var(--bg);
   overflow-x: hidden;
+}
+
+/* native cursor is hidden only once CustomCursor confirms a hover-capable
+   pointer is present, so touch devices are never affected */
+body.custom-cursor-active,
+body.custom-cursor-active a,
+body.custom-cursor-active button {
+  cursor: none;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background: rgba(var(--accent-rgb), 0.14);
+  pointer-events: none;
+  z-index: 100;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.custom-cursor-active {
+    cursor: auto;
+  }
+  .custom-cursor {
+    display: none;
+  }
 }
