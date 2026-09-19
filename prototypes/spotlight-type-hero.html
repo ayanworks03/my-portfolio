@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spotlight Type — Cursor-Proximity Variable Font Hero</title>
+
+<!-- Anybody: true variable weight axis 100–900, built for large display type -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wght@100..900&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #08080a;
+    --fg: #ffffff;
+    --muted: #8a8d93;
+    --blob: #ff4a2b;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+  }
+
+  body {
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+  }
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 3vh, 34px);
+    padding: 24px;
+    overflow: hidden;
+    isolation: isolate; /* keep atmosphere layers below content, contained */
+  }
+
+  /* ---------- supporting atmosphere ---------- */
+
+  /* soft warm blob, top-right, slow drift */
+  .blob {
+    position: absolute;
+    top: -10%;
+    right: -8%;
+    width: min(60vw, 760px);
+    height: min(60vw, 760px);
+    background: radial-gradient(circle, var(--blob) 0%, rgba(255,74,43,0) 68%);
+    opacity: 0.35;
+    filter: blur(90px);
+    z-index: -2;
+    animation: blob-drift 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes blob-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-6%, 8%) scale(1.08); }
+  }
+
+  /* faint vertical light wash rising from the bottom of the hero */
+  .wash {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 38%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* ---------- copy ---------- */
+
+  .eyebrow {
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .subhead {
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    font-size: clamp(13px, 1.4vw, 16px);
+    color: var(--muted);
+    letter-spacing: 0.01em;
+  }
+
+  /* ---------- the name ---------- */
+
+  .name {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    /* tracking is applied here; the browser adds this gap after every
+       inline-block child, including our fixed-width character spans */
+    letter-spacing: 0.12em;
+    font-family: 'Anybody', Helvetica, Arial, sans-serif;
+    /* clamp so the full word always fits on one line, at any viewport width */
+    font-size: clamp(40px, 13vw, 220px);
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    cursor: default;
+  }
+
+  .name .ch {
+    display: inline-block;
+    text-align: center;
+    /* width is measured and pinned in JS once the heaviest weight is known,
+       so thickening glyphs never shift their neighbours */
+    color: rgba(255, 255, 255, 0.28);
+    font-variation-settings: 'wght' 100;
+    will-change: font-variation-settings, text-shadow, color;
+  }
+
+  /* static, non-animated fallback for reduced-motion users */
+  @media (prefers-reduced-motion: reduce) {
+    .blob { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero" id="hero">
+  <div class="blob" aria-hidden="true"></div>
+  <div class="wash" aria-hidden="true"></div>
+
+  <span class="eyebrow">Shipping ideas into reality.</span>
+
+  <h1 class="name" id="name" aria-label="JISHNU">JISHNU</h1>
+
+  <p class="subhead">Product design and full-stack engineering, one build at a time.</p>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------------------------------------------------------------
+  // Tunables — change these to retune the effect without touching logic.
+  // ---------------------------------------------------------------------
+  var R = 300;              // px radius of cursor influence around each glyph
+  var EASE = 0.12;          // per-frame interpolation factor toward target weight
+  var MIN_WEIGHT = 100;     // resting (hairline) weight
+  var MAX_WEIGHT = 900;     // peak (heaviest) weight directly under the cursor
+  var SETTLE_EPS = 0.5;     // stop the rAF loop once every char is this close to target
+  var SWEEP_DURATION_MS = 4200; // touch fallback: one left-to-right sweep, ms
+
+  var nameEl = document.getElementById('name');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // ---------------------------------------------------------------------
+  // Step 1 — split the word into one <span class="ch"> per character.
+  // ---------------------------------------------------------------------
+  var word = nameEl.textContent.trim();
+  nameEl.textContent = '';
+
+  var chars = word.split('').map(function (letter) {
+    var span = document.createElement('span');
+    span.className = 'ch';
+    span.textContent = letter;
+    nameEl.appendChild(span);
+    return {
+      el: span,
+      current: MIN_WEIGHT,
+      target: MIN_WEIGHT,
+      t: 0,           // 0..1 proximity strength, cached for the bloom shadow
+      cx: 0, cy: 0     // cached center, recomputed on load + resize only
+    };
+  });
+
+  if (reduceMotion) {
+    // Reduced motion: static mid weight, no listeners, no rAF, no blob motion.
+    chars.forEach(function (c) {
+      c.el.style.fontVariationSettings = "'wght' 400";
+      c.el.style.color = 'rgba(255,255,255,0.85)';
+    });
+    return;
+  }
+
+  // ---------------------------------------------------------------------
+  // Measure each glyph's box at the heaviest weight, then pin that width
+  // so later weight changes never shift layout. Must run after the
+  // variable font has actually loaded, or the measurement uses a fallback
+  // font and will be wrong.
+  // ---------------------------------------------------------------------
+  function pinWidths() {
+    chars.forEach(function (c) {
+      c.el.style.width = 'auto';
+      c.el.style.fontVariationSettings = "'wght' " + MAX_WEIGHT;
+      var maxWidth = c.el.getBoundingClientRect().width;
+      c.el.style.width = Math.ceil(maxWidth) + 'px';
+      c.el.style.fontVariationSettings = "'wght' " + c.current;
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // Cache each character's screen-space center. Called once after layout
+  // settles, and again on resize — never inside the animation loop.
+  // ---------------------------------------------------------------------
+  function cacheCenters() {
+    chars.forEach(function (c) {
+      var r = c.el.getBoundingClientRect();
+      c.cx = r.left + r.width / 2;
+      c.cy = r.top + r.height / 2;
+    });
+  }
+
+  function measure() {
+    pinWidths();
+    cacheCenters();
+  }
+
+  // ---------------------------------------------------------------------
+  // The animation loop. Started on demand, stopped once everything has
+  // settled within SETTLE_EPS of its target so we're not spinning rAF
+  // forever at rest.
+  // ---------------------------------------------------------------------
+  var looping = false;
+  var sweeping = !canHover; // touch/no-hover devices always animate
+
+  function step() {
+    var allSettled = true;
+
+    for (var i = 0; i < chars.length; i++) {
+      var c = chars[i];
+      c.current += (c.target - c.current) * EASE;
+
+      if (Math.abs(c.target - c.current) > SETTLE_EPS) allSettled = false;
+
+      // Step 5 — apply via fontVariationSettings, never the font-weight
+      // shorthand (which only snaps between named instances).
+      c.el.style.fontVariationSettings = "'wght' " + c.current.toFixed(1);
+
+      // Fade in color + bloom together with proximity strength t, so only
+      // glyphs near the cursor actually glow.
+      var t = c.t;
+      c.el.style.color = 'rgba(255,255,255,' + (0.28 + t * 0.72).toFixed(3) + ')';
+      var glow = (18 * t).toFixed(1);
+      var glow2 = (44 * t).toFixed(1);
+      c.el.style.textShadow = t < 0.02
+        ? 'none'
+        : '0 0 ' + glow + 'px rgba(255,255,255,' + (0.55 * t).toFixed(3) + '), ' +
+          '0 0 ' + glow2 + 'px rgba(255,120,90,' + (0.25 * t).toFixed(3) + ')';
+    }
+
+    if (sweeping) {
+      requestAnimationFrame(step); // touch sweep never settles/stops
+      return;
+    }
+
+    if (!allSettled) {
+      requestAnimationFrame(step);
+    } else {
+      looping = false; // step 7 — park the loop until the next pointermove
+    }
+  }
+
+  function ensureLoop() {
+    if (!looping) {
+      looping = true;
+      requestAnimationFrame(step);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Steps 2–4 — on pointermove, compute each glyph's target weight from
+  // its cached center, never re-measuring the DOM inside this handler.
+  // ---------------------------------------------------------------------
+  function onPointerMove(e) {
+    var mx = e.clientX, my = e.clientY;
+    for (var i = 0; i < chars.length; i++) {
+      var c = chars[i];
+      var dx = mx - c.cx, dy = my - c.cy;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      var t = Math.max(0, Math.min(1, 1 - d / R));
+      t = t * t; // ease the falloff
+      c.t = t;
+      c.target = MIN_WEIGHT + t * (MAX_WEIGHT - MIN_WEIGHT);
+    }
+    ensureLoop();
+  }
+
+  // Step 6 — on leaving, relax every glyph back to hairline.
+  function onPointerLeave() {
+    chars.forEach(function (c) { c.target = MIN_WEIGHT; c.t = 0; });
+    ensureLoop();
+  }
+
+  // ---------------------------------------------------------------------
+  // Touch / no-hover fallback — sweep a virtual focal point left-to-right
+  // across the word on a slow loop instead of tracking a pointer.
+  // ---------------------------------------------------------------------
+  function runSweep() {
+    var startTime = null;
+    function frame(now) {
+      if (startTime === null) startTime = now;
+      var elapsed = (now - startTime) % SWEEP_DURATION_MS;
+      var phase = elapsed / SWEEP_DURATION_MS;         // 0..1 repeating
+      var wave = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2; // 0..1..0
+      var rect = nameEl.getBoundingClientRect();
+      var focalX = rect.left + wave * rect.width;
+      var focalY = rect.top + rect.height / 2;
+
+      for (var i = 0; i < chars.length; i++) {
+        var c = chars[i];
+        var dx = focalX - c.cx, dy = focalY - c.cy;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        var t = Math.max(0, Math.min(1, 1 - d / R));
+        t = t * t;
+        c.t = t;
+        c.target = MIN_WEIGHT + t * (MAX_WEIGHT - MIN_WEIGHT);
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------------------
+  // Wire it up once the variable font is actually ready and painted.
+  // ---------------------------------------------------------------------
+  document.fonts.ready.then(function () {
+    measure();
+
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(measure, 120);
+    });
+
+    if (canHover) {
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      document.addEventListener('pointerleave', onPointerLeave);
+      window.addEventListener('blur', onPointerLeave);
+    } else {
+      sweeping = true;
+      runSweep();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
