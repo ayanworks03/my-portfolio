@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import './App.css';
 import Loader from './components/Loader';
-import GlowField from './components/GlowField';
+import SmokeField from './components/SmokeField';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Ethos from './components/Ethos';
@@ -20,7 +20,7 @@ export default function App() {
     <div style={{ position: 'relative', background: 'var(--bg)', overflowX: 'hidden' }}>
       <Loader onDone={() => setReady(true)} />
 
-      <GlowField />
+      <SmokeField />
       <div
         style={{
           position: 'fixed',
