@@ -6,7 +6,7 @@ import type { Theme } from '../theme';
 // it can be distorted by the same noise driving the smoke itself — the
 // edge reads as cloud/smoke pulling back rather than a hard geometric
 // circle, while still following the cursor smoothly.
-const CANVAS_SCALE = 0.42;
+const CANVAS_SCALE = 0.32;
 const BASE_RADIUS = 260 * CANVAS_SCALE; // canvas px, roughly matches the old mask's size
 const EDGE_SOFTNESS = 70 * CANVAS_SCALE; // canvas px width of the soft transition band
 const RADIUS_NOISE_AMOUNT = 0.55; // how much the boundary bulges/recedes (fraction of BASE_RADIUS)
@@ -19,7 +19,7 @@ float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); 
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
   return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x), u.y); }
 float fbm(vec2 p){ float v=0.0; float a=0.5;
-  for(int i=0;i<4;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
+  for(int i=0;i<3;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
 // cheap 2-octave variant for the reveal edge — low-frequency noise is what
 // reads as soft puffy cloud bulges anyway, so it doesn't need fbm's full cost.
 float fbmEdge(vec2 p){ float v=0.0; float a=0.5;
@@ -88,7 +88,10 @@ export default function SmokeField({ theme }: { theme: Theme }) {
     let dead = false;
     let raf = 0;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'low-power' });
+    // high-performance (not low-power): on hybrid-GPU laptops the low-power
+    // hint can force the weak integrated chip, which was likely the actual
+    // cause of the reported lag rather than the shader cost itself.
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(1);
     renderer.setClearColor(0x07090c, 1);
     const cvs = renderer.domElement;
@@ -96,7 +99,7 @@ export default function SmokeField({ theme }: { theme: Theme }) {
     cvs.style.width = '100%';
     cvs.style.height = '100%';
     cvs.style.display = 'block';
-    cvs.style.filter = 'blur(3px)';
+    cvs.style.filter = 'blur(2px)';
     cvs.style.transform = 'scale(1.06)';
 
     const scene = new THREE.Scene();
@@ -148,7 +151,7 @@ export default function SmokeField({ theme }: { theme: Theme }) {
 
     const t0 = performance.now();
     let last = 0;
-    const FRAME = 1000 / 30;
+    const FRAME = 1000 / 24;
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
