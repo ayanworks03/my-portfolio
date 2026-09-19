@@ -69,17 +69,23 @@ export function useScrollMotion(headlineRef: React.RefObject<HTMLElement | null>
       /* smooth scroll is an enhancement; scroll still works natively without it */
     }
 
+    // These delays are short on purpose: `ready` (and so this whole effect)
+    // only fires once the loader has fully finished its own ~2s count +
+    // slide-away, unlike the original prototype where the entrance ran
+    // concurrently with the loader's exit. Stacking the original prototype's
+    // longer delays on top here left the hero looking empty for an extra
+    // 1.3-1.6s after the loader disappeared — a small stagger is enough now.
     if (headlineRef.current) {
       const letters = Array.from(headlineRef.current.children) as HTMLElement[];
       gsap.set(letters, { yPercent: 118, opacity: 0 });
-      gsap.to(letters, { yPercent: 0, opacity: 1, duration: 1.05, ease: 'power4.out', stagger: 0.05, delay: 1.35 });
+      gsap.to(letters, { yPercent: 0, opacity: 1, duration: 1.05, ease: 'power4.out', stagger: 0.05, delay: 0.1 });
     }
 
     const heroBits = gsap.utils.toArray<HTMLElement>('#top [data-reveal]');
     gsap.fromTo(
       heroBits,
       { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 1.6 },
+      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.35 },
     );
 
     gsap.utils.toArray<HTMLElement>('[data-split]').forEach((el) => {
