@@ -27,12 +27,10 @@ const VERTEX_SHADER = 'void main(){ gl_Position = vec4(position.xy,0.0,1.0); }';
 
 export default function SmokeField() {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const highlightRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const host = hostRef.current;
-    const highlight = highlightRef.current;
-    if (!host || !highlight) return;
+    if (!host) return;
 
     let dead = false;
     let raf = 0;
@@ -64,17 +62,19 @@ export default function SmokeField() {
     let py = idle().y;
     let sx = px;
     let sy = py;
-    let heat = 0;
-    let targetHeat = 0;
-    let lastMove = performance.now();
+    let active = false;
+    const RADIUS = 260;
 
     const onMove = (e: PointerEvent) => {
       px = e.clientX;
       py = e.clientY;
-      targetHeat = 1;
-      lastMove = performance.now();
+      active = true;
     };
     window.addEventListener('pointermove', onMove, { passive: true });
+    const onLeave = () => {
+      active = false;
+    };
+    document.addEventListener('mouseleave', onLeave);
 
     const resize = () => {
       const w = host.clientWidth || window.innerWidth;
@@ -91,26 +91,29 @@ export default function SmokeField() {
     let last = 0;
     const FRAME = 1000 / 30;
 
-    host.style.opacity = '0.6';
-
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
       if (dead) return;
 
-      if (now - lastMove > 700) targetHeat = 0;
-      heat += (targetHeat - heat) * 0.05;
-
-      if (!(now - lastMove < 700)) {
+      if (!active) {
         const home = idle();
         const tsec = (now - t0) / 1000;
         px = home.x + Math.sin(tsec * 0.2) * 100;
         py = home.y + Math.cos(tsec * 0.17) * 50;
       }
-      sx += (px - sx) * 0.05;
-      sy += (py - sy) * 0.05;
+      const follow = active ? 0.16 : 0.04;
+      sx += (px - sx) * follow;
+      sy += (py - sy) * follow;
 
-      highlight.style.opacity = (heat * 0.85).toFixed(3);
-      highlight.style.transform = `translate(${sx.toFixed(0)}px, ${sy.toFixed(0)}px)`;
+      // dim, dark ambient base everywhere; a soft, low-alpha halo around the
+      // cursor reveals the full-strength smoke colour underneath, like a
+      // flashlight through fog rather than an added light source
+      const r = RADIUS;
+      const m =
+        `radial-gradient(circle ${r}px at ${sx.toFixed(0)}px ${sy.toFixed(0)}px, ` +
+        'rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0.22) 88%, rgba(0,0,0,0.1) 100%)';
+      host.style.webkitMaskImage = m;
+      host.style.maskImage = m;
 
       if (now - last < FRAME) return;
       last = now;
@@ -123,6 +126,7 @@ export default function SmokeField() {
       dead = true;
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('mouseleave', onLeave);
       window.removeEventListener('resize', resize);
       renderer.dispose();
       if (cvs.parentNode) cvs.parentNode.removeChild(cvs);
@@ -130,27 +134,9 @@ export default function SmokeField() {
   }, []);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-      <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
-      <div
-        ref={highlightRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: 1100,
-          height: 1100,
-          marginLeft: -550,
-          marginTop: -550,
-          borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(150,240,242,0.4) 0%, rgba(120,225,228,0.22) 30%, rgba(95,212,214,0.1) 55%, rgba(95,212,214,0) 78%)',
-          filter: 'blur(20px)',
-          mixBlendMode: 'screen',
-          opacity: 0,
-          willChange: 'transform, opacity',
-        }}
-      />
-    </div>
+    <div
+      ref={hostRef}
+      style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', opacity: 0.95 }}
+    />
   );
 }
