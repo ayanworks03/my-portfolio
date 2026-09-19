@@ -5,7 +5,7 @@ import * as THREE from 'three';
 // it can be distorted by the same noise driving the smoke itself — the
 // edge reads as cloud/smoke pulling back rather than a hard geometric
 // circle, while still following the cursor smoothly.
-const CANVAS_SCALE = 0.55;
+const CANVAS_SCALE = 0.42;
 const BASE_RADIUS = 260 * CANVAS_SCALE; // canvas px, roughly matches the old mask's size
 const EDGE_SOFTNESS = 70 * CANVAS_SCALE; // canvas px width of the soft transition band
 const RADIUS_NOISE_AMOUNT = 0.55; // how much the boundary bulges/recedes (fraction of BASE_RADIUS)
@@ -18,7 +18,11 @@ float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); 
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
   return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x), u.y); }
 float fbm(vec2 p){ float v=0.0; float a=0.5;
-  for(int i=0;i<5;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
+  for(int i=0;i<4;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
+// cheap 2-octave variant for the reveal edge — low-frequency noise is what
+// reads as soft puffy cloud bulges anyway, so it doesn't need fbm's full cost.
+float fbmEdge(vec2 p){ float v=0.0; float a=0.5;
+  for(int i=0;i<2;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
 
 void main(){
   vec2 p = (gl_FragCoord.xy - 0.5*uRes.xy)/uRes.y;
@@ -33,7 +37,7 @@ void main(){
 
   // organic, slowly-drifting distortion of the reveal boundary so it reads
   // as smoke pulling back rather than a compass-drawn circle.
-  float edgeNoise = fbm(gl_FragCoord.xy * 0.012 + vec2(uTime*0.12, -uTime*0.09));
+  float edgeNoise = fbmEdge(gl_FragCoord.xy * 0.012 + vec2(uTime*0.12, -uTime*0.09));
   float effectiveRadius = ${BASE_RADIUS.toFixed(2)} * (1.0 - ${RADIUS_NOISE_AMOUNT.toFixed(2)} * 0.5 + ${RADIUS_NOISE_AMOUNT.toFixed(2)} * edgeNoise);
   float d = distance(gl_FragCoord.xy, uFocal);
   float reveal = 1.0 - smoothstep(effectiveRadius - ${EDGE_SOFTNESS.toFixed(2)}, effectiveRadius + ${EDGE_SOFTNESS.toFixed(2)}, d);
@@ -64,7 +68,7 @@ export default function SmokeField() {
     cvs.style.width = '100%';
     cvs.style.height = '100%';
     cvs.style.display = 'block';
-    cvs.style.filter = 'blur(5px)';
+    cvs.style.filter = 'blur(3px)';
     cvs.style.transform = 'scale(1.06)';
 
     const scene = new THREE.Scene();
