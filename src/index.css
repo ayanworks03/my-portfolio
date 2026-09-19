@@ -1,0 +1,83 @@
+:root {
+  --bg: #07090c;
+  --fg: #e9edf2;
+  --accent: #5fd4d6;
+  --accent-hover: #8ae6e7;
+  --muted: #a7aeb9;
+  --muted-2: #8b939e;
+  --muted-3: #7d848f;
+  --border: #1b2129;
+  --border-2: #2b3340;
+  --border-3: #33414f;
+  --card-bg: #0a0e14;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h2,
+h3 {
+  font-family: 'Poppins', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+input,
+textarea,
+button {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-3);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+#root {
+  position: relative;
+  background: var(--bg);
+  overflow-x: hidden;
+}

@@ -1,0 +1,98 @@
+import { useState } from 'react';
+
+const FIELD: React.CSSProperties = {
+  background: 'transparent',
+  border: 0,
+  borderBottom: '1px solid #222a35',
+  color: 'var(--fg)',
+  fontSize: 15,
+  padding: '12px 2px',
+  outline: 'none',
+};
+
+export default function Contact() {
+  const [sent, setSent] = useState(false);
+
+  return (
+    <section
+      id="contact"
+      style={{
+        position: 'relative',
+        zIndex: 2,
+        padding: 'clamp(60px,9vh,110px) clamp(18px,4vw,54px) clamp(50px,7vh,90px)',
+        background: 'rgba(7,9,12,0.9)',
+      }}
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 'clamp(28px,4vw,64px)', alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <h2 data-split style={{ fontSize: 'clamp(30px,5.6vw,76px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>
+            Tell me what you're building.
+          </h2>
+          <p data-reveal style={{ color: 'var(--muted)', fontSize: 16, lineHeight: 1.75, maxWidth: '42ch' }}>
+            Freelance and contract work, mobile or web. Send a short brief and I'll reply within a day.
+          </p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+              borderTop: '1px solid var(--border)',
+              paddingTop: 24,
+              fontFamily: "'JetBrains Mono',monospace",
+              fontSize: 13,
+              color: 'var(--muted)',
+            }}
+          >
+            <span>your@email.com</span>
+            <span>+00 000 000 0000</span>
+            <span>City, Country · remote friendly</span>
+            <div style={{ display: 'flex', gap: 18, paddingTop: 4 }}>
+              <a href="#top">GitHub</a>
+              <a href="#top">LinkedIn</a>
+              <a href="#top">Résumé ↓</a>
+            </div>
+          </div>
+        </div>
+
+        <form
+          data-reveal
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSent(true);
+          }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            padding: 'clamp(20px,2.6vw,38px)',
+            background: 'rgba(13,18,25,0.7)',
+          }}
+        >
+          <input type="text" placeholder="Name" className="field-input" style={FIELD} required />
+          <input type="email" placeholder="E-mail" className="field-input" style={FIELD} required />
+          <input type="text" placeholder="Budget / timeline" className="field-input" style={FIELD} />
+          <textarea rows={4} placeholder="What are you building?" className="field-input" style={{ ...FIELD, resize: 'vertical' }} required />
+          <button
+            type="submit"
+            className="btn-accent"
+            style={{
+              alignSelf: 'flex-start',
+              fontSize: 15,
+              fontWeight: 500,
+              padding: '14px 30px',
+              background: 'var(--accent)',
+              color: 'var(--bg)',
+              border: 0,
+              borderRadius: 999,
+              cursor: 'pointer',
+            }}
+          >
+            {sent ? 'Sent ✓' : 'Send message →'}
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}

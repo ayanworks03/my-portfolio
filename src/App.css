@@ -1,0 +1,39 @@
+[data-reveal] {
+  opacity: 0;
+}
+
+.nav-cta {
+  border: 1px solid var(--border-2);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.nav-cta:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-accent {
+  transition: background 0.2s ease;
+}
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+
+.work-card {
+  transition: border-color 0.2s ease;
+}
+.work-card:hover {
+  border-color: var(--border-3);
+}
+
+.field-input {
+  transition: border-bottom-color 0.2s ease;
+}
+.field-input:focus {
+  border-bottom-color: var(--accent) !important;
+}
+
+@media (max-width: 700px) {
+  .work-grid > a[style*='grid-column: span 2'] {
+    grid-column: span 1 !important;
+  }
+}
