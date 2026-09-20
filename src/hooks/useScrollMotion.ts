@@ -40,6 +40,19 @@ export function useScrollMotion(headlineRef: React.RefObject<HTMLElement | null>
   useEffect(() => {
     if (!ready) return;
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      // Skip Lenis (it alters natural scroll physics) and every GSAP
+      // entrance/scroll-triggered animation — just show everything in its
+      // final state immediately. [data-reveal] defaults to opacity:0 via
+      // CSS (App.css), so it needs this or it would stay invisible forever.
+      if (headlineRef.current) {
+        gsap.set(Array.from(headlineRef.current.children), { opacity: 1 });
+      }
+      gsap.set('[data-reveal]', { opacity: 1 });
+      return;
+    }
+
     const triggers: ScrollTrigger[] = [];
     let lenis: Lenis | null = null;
     let lenisRaf = 0;

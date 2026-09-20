@@ -33,7 +33,7 @@
 }
 
 @media (max-width: 700px) {
-  .work-grid > a[style*='grid-column: span 2'] {
+  .work-card--wide {
     grid-column: span 1 !important;
   }
 }

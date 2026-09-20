@@ -20,7 +20,7 @@ export default function Work() {
         <a
           data-reveal
           href="#contact"
-          className="work-card"
+          className="work-card work-card--wide"
           style={{ ...CARD, gridColumn: 'span 2', minWidth: 0, background: 'linear-gradient(135deg,#10161f,#0a0e14)' }}
         >
           <div
@@ -105,7 +105,7 @@ export default function Work() {
         <a
           data-reveal
           href="#contact"
-          className="work-card"
+          className="work-card work-card--wide"
           style={{
             ...CARD,
             gridColumn: 'span 2',

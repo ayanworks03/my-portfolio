@@ -71,17 +71,20 @@ function readAccentRgb(): [number, number, number] {
 export default function SmokeField({ theme }: { theme: Theme }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const accentUniformRef = useRef<{ value: THREE.Vector3 } | null>(null);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // re-sync the shader's accent colour whenever the theme changes, without
   // tearing down and rebuilding the whole WebGL context.
   useEffect(() => {
+    if (reduceMotion) return;
     const u = accentUniformRef.current;
     if (!u) return;
     const [r, g, b] = readAccentRgb();
     u.value.set(r, g, b);
-  }, [theme]);
+  }, [theme, reduceMotion]);
 
   useEffect(() => {
+    if (reduceMotion) return;
     const host = hostRef.current;
     if (!host) return;
 
@@ -187,7 +190,24 @@ export default function SmokeField({ theme }: { theme: Theme }) {
       renderer.dispose();
       if (cvs.parentNode) cvs.parentNode.removeChild(cvs);
     };
-  }, []);
+  }, [reduceMotion]);
+
+  if (reduceMotion) {
+    // No WebGL, no cursor tracking, no per-frame noise — a fixed, static
+    // glow keeps the hero's visual character without any motion for users
+    // who've asked for less of it.
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          background: 'radial-gradient(circle at 50% 40%, rgba(var(--accent-rgb),0.28) 0%, rgba(var(--accent-rgb),0.08) 45%, rgba(7,9,12,0) 72%)',
+        }}
+      />
+    );
+  }
 
   return (
     <div

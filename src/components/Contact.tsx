@@ -7,7 +7,26 @@ const FIELD: React.CSSProperties = {
   color: 'var(--fg)',
   fontSize: 15,
   padding: '12px 2px',
-  outline: 'none',
+  // no outline:none here — that would defeat index.css's :focus-visible
+  // ring (an inline style always wins over an external stylesheet rule),
+  // leaving keyboard users with only the underline-color change as
+  // feedback.
+};
+
+// Visually identical to having no label (placeholder still carries the
+// visible design), but gives screen readers a persistent name for the
+// field instead of losing it the moment the placeholder is replaced by
+// typed text.
+const SR_ONLY: React.CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0,0,0,0)',
+  whiteSpace: 'nowrap',
+  border: 0,
 };
 
 export default function Contact() {
@@ -70,10 +89,33 @@ export default function Contact() {
             background: 'rgba(13,18,25,0.7)',
           }}
         >
-          <input type="text" placeholder="Name" className="field-input" style={FIELD} required />
-          <input type="email" placeholder="E-mail" className="field-input" style={FIELD} required />
-          <input type="text" placeholder="Budget / timeline" className="field-input" style={FIELD} />
-          <textarea rows={4} placeholder="What are you building?" className="field-input" style={{ ...FIELD, resize: 'vertical' }} required />
+          <label htmlFor="contact-name" style={SR_ONLY}>
+            Name
+          </label>
+          <input id="contact-name" name="name" type="text" placeholder="Name" className="field-input" style={FIELD} required />
+
+          <label htmlFor="contact-email" style={SR_ONLY}>
+            E-mail
+          </label>
+          <input id="contact-email" name="email" type="email" placeholder="E-mail" className="field-input" style={FIELD} required />
+
+          <label htmlFor="contact-budget" style={SR_ONLY}>
+            Budget / timeline
+          </label>
+          <input id="contact-budget" name="budget" type="text" placeholder="Budget / timeline" className="field-input" style={FIELD} />
+
+          <label htmlFor="contact-message" style={SR_ONLY}>
+            What are you building?
+          </label>
+          <textarea
+            id="contact-message"
+            name="message"
+            rows={4}
+            placeholder="What are you building?"
+            className="field-input"
+            style={{ ...FIELD, resize: 'vertical' }}
+            required
+          />
           <button
             type="submit"
             className="btn-accent"

@@ -11,6 +11,20 @@ export default function Loader({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     let dead = false;
     let raf = 0;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      // skip the count-up and the slide-away transition entirely — just a
+      // brief, non-animated pause so it doesn't read as a broken flash.
+      setCount(100);
+      if (barRef.current) barRef.current.style.width = '100%';
+      const t = setTimeout(() => {
+        setHidden(true);
+        onDone();
+      }, 200);
+      return () => clearTimeout(t);
+    }
+
     const DUR = 1250;
     const t0 = performance.now();
 
