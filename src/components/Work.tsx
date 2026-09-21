@@ -1,7 +1,22 @@
+import { motion } from 'framer-motion';
+import { useTilt } from '../hooks/useTilt';
+
 const LABEL: React.CSSProperties = { fontFamily: "'JetBrains Mono',monospace", fontSize: 10, letterSpacing: '0.2em', color: 'var(--accent)' };
-const CARD: React.CSSProperties = { border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', display: 'flex', flexDirection: 'column' };
+const CARD: React.CSSProperties = {
+  border: '1px solid var(--border)',
+  borderRadius: 6,
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  willChange: 'transform',
+};
 
 export default function Work() {
+  const tilt1 = useTilt<HTMLAnchorElement>();
+  const tilt2 = useTilt<HTMLAnchorElement>();
+  const tilt3 = useTilt<HTMLAnchorElement>();
+  const tilt4 = useTilt<HTMLAnchorElement>();
+
   return (
     <section
       id="work"
@@ -17,11 +32,14 @@ export default function Work() {
       </div>
 
       <div className="work-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,330px),1fr))', gap: 'clamp(14px,1.8vw,24px)' }}>
-        <a
+        <motion.a
           data-reveal
           href="#contact"
           className="work-card work-card--wide"
-          style={{ ...CARD, gridColumn: 'span 2', minWidth: 0, background: 'linear-gradient(135deg,#10161f,#0a0e14)' }}
+          ref={tilt1.ref}
+          onMouseMove={tilt1.onMouseMove}
+          onMouseLeave={tilt1.onMouseLeave}
+          style={{ ...CARD, ...tilt1.style, gridColumn: 'span 2', minWidth: 0, background: 'linear-gradient(135deg,#10161f,#0a0e14)' }}
         >
           <div
             style={{
@@ -47,9 +65,17 @@ export default function Work() {
               layout code.
             </p>
           </div>
-        </a>
+        </motion.a>
 
-        <a data-reveal href="#contact" className="work-card" style={{ ...CARD, minWidth: 0, background: 'var(--card-bg)' }}>
+        <motion.a
+          data-reveal
+          href="#contact"
+          className="work-card"
+          ref={tilt2.ref}
+          onMouseMove={tilt2.onMouseMove}
+          onMouseLeave={tilt2.onMouseLeave}
+          style={{ ...CARD, ...tilt2.style, minWidth: 0, background: 'var(--card-bg)' }}
+        >
           <div
             style={{
               aspectRatio: '4/3',
@@ -73,9 +99,17 @@ export default function Work() {
               Search by what's already in the kitchen. Saved collections and offline favourites, one codebase for both platforms.
             </p>
           </div>
-        </a>
+        </motion.a>
 
-        <a data-reveal href="#contact" className="work-card" style={{ ...CARD, minWidth: 0, background: 'var(--card-bg)' }}>
+        <motion.a
+          data-reveal
+          href="#contact"
+          className="work-card"
+          ref={tilt3.ref}
+          onMouseMove={tilt3.onMouseMove}
+          onMouseLeave={tilt3.onMouseLeave}
+          style={{ ...CARD, ...tilt3.style, minWidth: 0, background: 'var(--card-bg)' }}
+        >
           <div
             style={{
               aspectRatio: '4/3',
@@ -100,14 +134,18 @@ export default function Work() {
               Browse countries by region against live data, with search, filters and a detail view for every country.
             </p>
           </div>
-        </a>
+        </motion.a>
 
-        <a
+        <motion.a
           data-reveal
           href="#contact"
           className="work-card work-card--wide"
+          ref={tilt4.ref}
+          onMouseMove={tilt4.onMouseMove}
+          onMouseLeave={tilt4.onMouseLeave}
           style={{
             ...CARD,
+            ...tilt4.style,
             gridColumn: 'span 2',
             minWidth: 0,
             background: 'var(--card-bg)',
@@ -143,7 +181,7 @@ export default function Work() {
             <span>agent › shipped tuesday, arriving thu.</span>
             <span style={{ color: '#4b535e' }}>— 0.8s · 2 tools called</span>
           </div>
-        </a>
+        </motion.a>
       </div>
     </section>
   );
