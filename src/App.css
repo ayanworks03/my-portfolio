@@ -18,6 +18,13 @@
   background: var(--accent-hover);
 }
 
+.work-card {
+  transition: border-color 0.2s ease;
+}
+.work-card:hover {
+  border-color: var(--border-3);
+}
+
 .field-input {
   transition: border-bottom-color 0.2s ease;
 }
