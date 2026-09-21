@@ -24,7 +24,7 @@ export default function Work() {
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap', marginBottom: 'clamp(26px,4vh,48px)' }}>
         <h2 data-split style={{ fontSize: 'clamp(26px,4vw,52px)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-          Selected work
+          Selected projects
         </h2>
         <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.14em', color: 'var(--muted-3)' }}>
           04 PROJECTS · 2024—2026

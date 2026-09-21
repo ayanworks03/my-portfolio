@@ -127,7 +127,7 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
           <span style={{ width: 30, height: 30, borderRadius: 999, background: 'rgba(7,9,12,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>
             ↗
           </span>
-          Explore work →
+          Explore projects →
         </a>
       </div>
 

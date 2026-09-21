@@ -14,7 +14,7 @@ const ITEMS = [
   },
   {
     href: '#work',
-    label: 'Work',
+    label: 'Projects',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={ICON}>
         <rect x="3" y="7.5" width="18" height="12" rx="2" />
