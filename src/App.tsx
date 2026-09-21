@@ -1,7 +1,6 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react';
 import './App.css';
 import Loader from './components/Loader';
-import SmokeField from './components/SmokeField';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Ethos from './components/Ethos';
@@ -12,6 +11,11 @@ import ThemeSwitcher from './components/ThemeSwitcher';
 import CustomCursor from './components/CustomCursor';
 import { useScrollMotion } from './hooks/useScrollMotion';
 import { loadTheme, saveTheme, type Theme } from './theme';
+
+// Three.js accounts for most of the JS bundle and is purely decorative —
+// splitting it into its own chunk lets the rest of the page (text, nav,
+// form) paint without waiting on it to download.
+const SmokeField = lazy(() => import('./components/SmokeField'));
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -35,7 +39,9 @@ export default function App() {
       <Loader onDone={() => setReady(true)} />
       <CustomCursor />
 
-      <SmokeField theme={theme} />
+      <Suspense fallback={null}>
+        <SmokeField theme={theme} />
+      </Suspense>
       <div
         style={{
           position: 'fixed',
