@@ -190,14 +190,19 @@ export function DockLabel({ children, className, ...rest }: DockLabelProps) {
       {isVisible && (
         <motion.div
           initial={{ opacity: 0, y: 0 }}
-          animate={{ opacity: 1, y: -10 }}
+          animate={{ opacity: 1, y: 10 }}
           exit={{ opacity: 0, y: 0 }}
           transition={{ duration: 0.2 }}
           className={className}
           role="tooltip"
           style={{
             position: 'absolute',
-            top: -30,
+            // the item's own height grows downward on hover (its top edge
+            // stays put — see DockItem's restOffset), so anchoring to its
+            // bottom (100%) rather than a fixed px offset keeps the label
+            // following that growing edge instead of getting swallowed by it.
+            top: '100%',
+            marginTop: 8,
             left: '50%',
             x: '-50%',
             whiteSpace: 'pre',
