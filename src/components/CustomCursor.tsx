@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { readAccentRgb } from '../lib/readAccentRgb';
 
 // A field of short dash-shaped particles spawns around the cursor and
 // drifts outward, fading as it goes — each particle is drawn as a line
@@ -26,11 +27,6 @@ type Particle = {
   vy: number;
   born: number;
 };
-
-function readAccentRgb(): string {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim();
-  return raw || '95,212,214';
-}
 
 export default function CustomCursor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
