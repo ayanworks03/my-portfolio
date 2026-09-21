@@ -4,6 +4,7 @@ import Loader from './components/Loader';
 import Header from './components/Header';
 import NavDock from './components/NavDock';
 import Hero from './components/Hero';
+import TechMarquee from './components/TechMarquee';
 import Ethos from './components/Ethos';
 import Work from './components/Work';
 import FAQ from './components/FAQ';
@@ -60,6 +61,7 @@ export default function App() {
       <NavDock />
 
       <Hero ref={headlineRef} />
+      <TechMarquee />
       <Ethos />
       <Work />
       <FAQ />
