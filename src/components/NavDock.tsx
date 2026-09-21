@@ -31,7 +31,7 @@ export default function NavDock() {
       <div style={{ pointerEvents: 'auto' }}>
         <Dock>
           {ITEMS.map((item) => (
-            <DockItem key={item.href} href={item.href}>
+            <DockItem key={item.href} href={item.href} aria-label={item.label}>
               <DockIcon>{item.icon}</DockIcon>
               <DockLabel>{item.label}</DockLabel>
             </DockItem>

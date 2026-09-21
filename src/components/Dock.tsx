@@ -42,6 +42,7 @@ type DockItemProps = {
   children: ReactNode;
   onClick?: () => void;
   href?: string;
+  'aria-label'?: string;
 };
 
 type DockLabelProps = {
@@ -110,7 +111,7 @@ export function Dock({
   );
 }
 
-export function DockItem({ children, className, onClick, href }: DockItemProps) {
+export function DockItem({ children, className, onClick, href, 'aria-label': ariaLabel }: DockItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { distance, magnification, mouseX, spring, panelHeight } = useDock();
   const isHovered = useMotionValue(0);
@@ -155,11 +156,15 @@ export function DockItem({ children, className, onClick, href }: DockItemProps) 
     onClick,
     className,
     tabIndex: 0,
+    'aria-label': ariaLabel,
   };
 
   // Real <a href> so the site-wide anchor-click listener in useScrollMotion
   // (which wires up Lenis smooth-scroll for every `a[href^="#"]`) picks
-  // these up the same way as any other in-page link.
+  // these up the same way as any other in-page link. aria-label is needed
+  // because the visible label only ever renders on hover/focus (DockLabel's
+  // tooltip) — without it, the link's accessible name is empty (just an
+  // icon), so it announces as nothing to a screen reader.
   if (href) {
     return (
       <motion.a href={href} aria-haspopup="true" {...shared}>

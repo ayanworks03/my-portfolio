@@ -52,7 +52,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
           color: 'var(--fg)',
         }}
       >
-        <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, color: 'var(--muted-3)', flexShrink: 0 }}>
+        <span aria-hidden="true" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, color: 'var(--muted-3)', flexShrink: 0 }}>
           {String(index + 1).padStart(2, '0')}
         </span>
         <span style={{ flex: 1, fontSize: 'clamp(16px,1.9vw,22px)', fontWeight: 500, letterSpacing: '-0.01em' }}>{q}</span>
