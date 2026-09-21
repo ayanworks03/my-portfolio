@@ -24,10 +24,10 @@ import {
   type ReactNode,
 } from 'react';
 
-const DOCK_HEIGHT = 90;
-const DEFAULT_MAGNIFICATION = 62;
-const DEFAULT_DISTANCE = 130;
-const DEFAULT_PANEL_HEIGHT = 52;
+const DOCK_HEIGHT = 120;
+const DEFAULT_MAGNIFICATION = 84;
+const DEFAULT_DISTANCE = 150;
+const DEFAULT_PANEL_HEIGHT = 68;
 
 type DockProps = {
   children: ReactNode;
@@ -101,8 +101,8 @@ export function Dock({
           height: panelHeight,
           display: 'flex',
           alignItems: 'center',
-          gap: 14,
-          padding: '0 16px',
+          gap: 18,
+          padding: '0 20px',
           borderRadius: 999,
           background: 'rgba(13,18,25,0.72)',
           backdropFilter: 'blur(14px)',
