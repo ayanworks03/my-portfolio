@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useTiltSpotlight } from '../hooks/useTiltSpotlight';
 
 const LABEL: React.CSSProperties = { fontFamily: "'JetBrains Mono',monospace", fontSize: 10, letterSpacing: '0.2em', color: 'var(--accent)' };
@@ -35,10 +36,10 @@ const CARD: React.CSSProperties = {
 };
 
 export default function Work() {
-  const tilt1 = useTiltSpotlight<HTMLDivElement, HTMLAnchorElement>();
-  const tilt2 = useTiltSpotlight<HTMLDivElement, HTMLAnchorElement>();
-  const tilt3 = useTiltSpotlight<HTMLDivElement, HTMLAnchorElement>();
-  const tilt4 = useTiltSpotlight<HTMLDivElement, HTMLAnchorElement>();
+  const tilt1 = useTiltSpotlight<HTMLDivElement>();
+  const tilt2 = useTiltSpotlight<HTMLDivElement>();
+  const tilt3 = useTiltSpotlight<HTMLDivElement>();
+  const tilt4 = useTiltSpotlight<HTMLDivElement>();
 
   return (
     <section
@@ -57,7 +58,7 @@ export default function Work() {
       <div className="work-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,330px),1fr))', gap: 'clamp(14px,1.8vw,24px)' }}>
         <div data-reveal className="work-card work-card--wide" ref={tilt1.wrapRef} onMouseMove={tilt1.onMouseMove} onMouseLeave={tilt1.onMouseLeave} style={wrapStyle(true)}>
           <div ref={tilt1.glowRef} style={glowStyle} />
-          <a ref={tilt1.cardRef} href="#contact" style={{ ...CARD, background: 'linear-gradient(135deg,#10161f,#0a0e14)' }}>
+          <motion.a href="#contact" style={{ ...CARD, ...tilt1.style, background: 'linear-gradient(135deg,#10161f,#0a0e14)' }}>
             <div
               style={{
                 aspectRatio: '21/9',
@@ -82,12 +83,12 @@ export default function Work() {
                 layout code.
               </p>
             </div>
-          </a>
+          </motion.a>
         </div>
 
         <div data-reveal className="work-card" ref={tilt2.wrapRef} onMouseMove={tilt2.onMouseMove} onMouseLeave={tilt2.onMouseLeave} style={wrapStyle(false)}>
           <div ref={tilt2.glowRef} style={glowStyle} />
-          <a ref={tilt2.cardRef} href="#contact" style={{ ...CARD, background: 'var(--card-bg)' }}>
+          <motion.a href="#contact" style={{ ...CARD, ...tilt2.style, background: 'var(--card-bg)' }}>
             <div
               style={{
                 aspectRatio: '4/3',
@@ -111,12 +112,12 @@ export default function Work() {
                 Search by what's already in the kitchen. Saved collections and offline favourites, one codebase for both platforms.
               </p>
             </div>
-          </a>
+          </motion.a>
         </div>
 
         <div data-reveal className="work-card" ref={tilt3.wrapRef} onMouseMove={tilt3.onMouseMove} onMouseLeave={tilt3.onMouseLeave} style={wrapStyle(false)}>
           <div ref={tilt3.glowRef} style={glowStyle} />
-          <a ref={tilt3.cardRef} href="#contact" style={{ ...CARD, background: 'var(--card-bg)' }}>
+          <motion.a href="#contact" style={{ ...CARD, ...tilt3.style, background: 'var(--card-bg)' }}>
             <div
               style={{
                 aspectRatio: '4/3',
@@ -141,15 +142,14 @@ export default function Work() {
                 Browse countries by region against live data, with search, filters and a detail view for every country.
               </p>
             </div>
-          </a>
+          </motion.a>
         </div>
 
         <div data-reveal className="work-card work-card--wide" ref={tilt4.wrapRef} onMouseMove={tilt4.onMouseMove} onMouseLeave={tilt4.onMouseLeave} style={wrapStyle(true)}>
           <div ref={tilt4.glowRef} style={glowStyle} />
-          <a
-            ref={tilt4.cardRef}
+          <motion.a
             href="#contact"
-            style={{ ...CARD, background: 'var(--card-bg)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,260px),1fr))' }}
+            style={{ ...CARD, ...tilt4.style, background: 'var(--card-bg)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,260px),1fr))' }}
           >
             <div style={{ padding: 'clamp(20px,2.2vw,32px)', display: 'flex', flexDirection: 'column', gap: 12, justifyContent: 'center' }}>
               <span style={LABEL}>04 · AI / AUTOMATION</span>
@@ -179,7 +179,7 @@ export default function Work() {
               <span>agent › shipped tuesday, arriving thu.</span>
               <span style={{ color: '#4b535e' }}>— 0.8s · 2 tools called</span>
             </div>
-          </a>
+          </motion.a>
         </div>
       </div>
     </section>
