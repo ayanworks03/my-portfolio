@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import LetterField from './LetterField';
 import { Magnetic } from './Magnetic';
+import TechMarquee from './TechMarquee';
 
 const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
   return (
@@ -131,7 +132,11 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
         </a>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 22 }}>
+      <div style={{ margin: '22px calc(-1 * clamp(18px,4vw,54px)) 0' }}>
+        <TechMarquee />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 18 }}>
         <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 10, letterSpacing: '0.3em', color: '#c3cad3' }}>SCROLL</span>
       </div>
     </section>

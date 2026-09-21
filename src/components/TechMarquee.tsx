@@ -97,10 +97,12 @@ export default function TechMarquee() {
       style={{
         position: 'relative',
         zIndex: 2,
+        display: 'flex',
+        alignItems: 'center',
         overflow: 'hidden',
         borderTop: '1px solid var(--border)',
         borderBottom: '1px solid var(--border)',
-        padding: 'clamp(22px,3.4vh,34px) 0',
+        padding: 'clamp(14px,2.2vh,20px) 0',
         background: 'linear-gradient(90deg, rgba(var(--accent-rgb),0.14), rgba(7,9,12,0) 55%)',
       }}
     >
