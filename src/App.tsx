@@ -6,10 +6,12 @@ import NavDock from './components/NavDock';
 import Hero from './components/Hero';
 import Ethos from './components/Ethos';
 import Work from './components/Work';
+import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import CustomCursor from './components/CustomCursor';
+import ScrollProgress from './components/ScrollProgress';
 import { useScrollMotion } from './hooks/useScrollMotion';
 import { loadTheme, saveTheme, type Theme } from './theme';
 
@@ -53,12 +55,14 @@ export default function App() {
         }}
       />
 
+      <ScrollProgress />
       <Header />
       <NavDock />
 
       <Hero ref={headlineRef} />
       <Ethos />
       <Work />
+      <FAQ />
       <Contact />
       <Footer />
 
