@@ -1,72 +1,140 @@
 import { useEffect, useRef } from 'react';
 
-const FOLLOW = 0.25; // per-frame interpolation toward the raw pointer position
-const HOVER_SCALE = 1.9;
+// A field of short dash-shaped particles spawns around the cursor and
+// drifts outward, fading as it goes — each particle is drawn as a line
+// from its previous frame's position to its current one, which is what
+// gives them that streaked/dash look instead of plain dots.
+const SPAWN_INTERVAL_MS = 12; // ~one burst per frame while the pointer is moving
+const PARTICLES_PER_SPAWN = 5;
+const HOVER_SPAWN_MULTIPLIER = 2; // denser field over links/buttons, as a hover cue
+const CLICK_BURST_COUNT = 30;
+const PARTICLE_LIFETIME_MS = 1000;
+const SPAWN_RADIUS = 10; // px offset from the exact cursor point
+const INITIAL_SPEED = 0.4; // px/ms
+const FRICTION = 0.965; // per-frame velocity decay
+
+type Particle = {
+  x: number;
+  y: number;
+  px: number;
+  py: number;
+  vx: number;
+  vy: number;
+  born: number;
+};
+
+function readAccentRgb(): string {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim();
+  return raw || '95,212,214';
+}
 
 export default function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     if (reduceMotion || !canHover) return;
 
-    const dot = dotRef.current;
-    if (!dot) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
 
     document.body.classList.add('custom-cursor-active');
 
+    let dead = false;
+    let raf = 0;
+    let lastFrame = performance.now();
+    let lastSpawn = 0;
     let mx = window.innerWidth / 2;
     let my = window.innerHeight / 2;
-    let cx = mx;
-    let cy = my;
-    let scale = 1;
-    let targetScale = 1;
-    let visible = false;
-    let raf = 0;
+    let hovering = false;
+    const particles: Particle[] = [];
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const resize = () => {
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    const spawnOne = (now: number) => {
+      const a = Math.random() * Math.PI * 2;
+      const r = SPAWN_RADIUS * (0.4 + Math.random() * 0.6);
+      const speed = INITIAL_SPEED * (0.6 + Math.random() * 0.9);
+      const px = mx + Math.cos(a) * r;
+      const py = my + Math.sin(a) * r;
+      particles.push({ x: px, y: py, px, py, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, born: now });
+    };
 
     const onMove = (e: PointerEvent) => {
       mx = e.clientX;
       my = e.clientY;
-      visible = true;
       const el = e.target;
-      targetScale = el instanceof Element && el.closest('a, button, input, textarea') ? HOVER_SCALE : 1;
+      hovering = el instanceof Element && !!el.closest('a, button, input, textarea');
+      const now = performance.now();
+      if (now - lastSpawn > SPAWN_INTERVAL_MS) {
+        lastSpawn = now;
+        const count = PARTICLES_PER_SPAWN * (hovering ? HOVER_SPAWN_MULTIPLIER : 1);
+        for (let i = 0; i < count; i++) spawnOne(now);
+      }
     };
     window.addEventListener('pointermove', onMove, { passive: true });
 
-    const onLeaveWindow = () => {
-      visible = false;
-    };
-    document.addEventListener('mouseleave', onLeaveWindow);
-
     const onDown = () => {
-      targetScale *= 0.85;
+      const now = performance.now();
+      for (let i = 0; i < CLICK_BURST_COUNT; i++) spawnOne(now);
     };
-    const onUp = () => {
-      targetScale = targetScale > HOVER_SCALE * 0.9 ? HOVER_SCALE : 1;
-    };
-    window.addEventListener('pointerdown', onDown);
-    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointerdown', onDown, { passive: true });
 
-    const tick = () => {
+    const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
-      cx += (mx - cx) * FOLLOW;
-      cy += (my - cy) * FOLLOW;
-      scale += (targetScale - scale) * 0.2;
-      dot.style.opacity = visible ? '1' : '0';
-      dot.style.transform = `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px) scale(${scale.toFixed(2)})`;
+      if (dead) return;
+      const dt = Math.min(48, now - lastFrame);
+      lastFrame = now;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const accentRgb = readAccentRgb();
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        const age = now - p.born;
+        if (age > PARTICLE_LIFETIME_MS) {
+          particles.splice(i, 1);
+          continue;
+        }
+        p.px = p.x;
+        p.py = p.y;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= FRICTION;
+        p.vy *= FRICTION;
+
+        const lifeT = 1 - age / PARTICLE_LIFETIME_MS;
+        ctx.strokeStyle = `rgba(${accentRgb}, ${Math.min(1, lifeT * 1.3).toFixed(3)})`;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p.px, p.py);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
     };
     raf = requestAnimationFrame(tick);
 
     return () => {
       document.body.classList.remove('custom-cursor-active');
+      dead = true;
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
-      document.removeEventListener('mouseleave', onLeaveWindow);
       window.removeEventListener('pointerdown', onDown);
-      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('resize', resize);
     };
   }, []);
 
-  return <div ref={dotRef} className="custom-cursor" style={{ opacity: 0 }} />;
+  return <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, zIndex: 100, pointerEvents: 'none' }} />;
 }

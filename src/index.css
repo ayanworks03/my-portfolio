@@ -109,35 +109,11 @@ html.lenis body {
   overflow-x: hidden;
 }
 
-/* native cursor is hidden only once CustomCursor confirms a hover-capable
-   pointer is present, so touch devices are never affected */
+/* CustomCursor only adds this class once it has confirmed a hover-capable
+   pointer AND that the visitor hasn't asked for reduced motion, so this
+   rule never applies to touch devices or motion-sensitive users. */
 body.custom-cursor-active,
 body.custom-cursor-active a,
 body.custom-cursor-active button {
   cursor: none;
-}
-
-.custom-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  margin-left: -10px;
-  margin-top: -10px;
-  border-radius: 50%;
-  border: 1.5px solid var(--accent);
-  background: rgba(var(--accent-rgb), 0.14);
-  pointer-events: none;
-  z-index: 100;
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.custom-cursor-active {
-    cursor: auto;
-  }
-  .custom-cursor {
-    display: none;
-  }
 }
