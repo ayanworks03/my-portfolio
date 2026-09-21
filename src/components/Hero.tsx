@@ -26,12 +26,6 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
             Building quietly, shipping often.
           </span>
         </div>
-        <span
-          data-reveal
-          style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.22em', color: 'var(--muted-2)', textTransform: 'uppercase' }}
-        >
-          Karachi · Remote · 2026
-        </span>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(40px,6vh,80px)', padding: 'clamp(18px,4vh,48px) 0' }}>

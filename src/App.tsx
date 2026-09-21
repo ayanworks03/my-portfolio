@@ -2,6 +2,7 @@ import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react';
 import './App.css';
 import Loader from './components/Loader';
 import Header from './components/Header';
+import NavDock from './components/NavDock';
 import Hero from './components/Hero';
 import Ethos from './components/Ethos';
 import Work from './components/Work';
@@ -53,6 +54,7 @@ export default function App() {
       />
 
       <Header />
+      <NavDock />
 
       <Hero ref={headlineRef} />
       <Ethos />
