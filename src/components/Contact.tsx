@@ -54,23 +54,24 @@ export default function Contact() {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 16,
+              gap: 18,
               borderTop: '1px solid var(--border)',
               paddingTop: 24,
               fontFamily: "'Inter',sans-serif",
-              fontSize: 13,
-              color: 'var(--muted)',
             }}
           >
-            <a href="mailto:ayan.works.03@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ flexShrink: 0 }}>
+            <a
+              href="mailto:ayan.works.03@gmail.com"
+              style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, fontWeight: 500, color: 'var(--fg)' }}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ flexShrink: 0 }}>
                 <rect x="2.5" y="5" width="19" height="14" rx="2.4" />
                 <path d="M3.5 6.5 12 13l8.5-6.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               ayan.works.03@gmail.com
             </a>
-            <a href="tel:+923240146711" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ flexShrink: 0 }}>
+            <a href="tel:+923240146711" style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, fontWeight: 500, color: 'var(--fg)' }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ flexShrink: 0 }}>
                 <path
                   d="M6.6 3.8 9.2 8.3c.3.5.2 1.1-.2 1.5L7.3 11.5c1 2.3 3 4.3 5.3 5.3l1.7-1.7c.4-.4 1-.5 1.5-.2l4.5 2.6c.6.3.8 1.1.4 1.6l-1.6 2.1c-.4.5-1 .8-1.6.8C9.9 22 2 14.1 2 4.6c0-.6.3-1.2.8-1.6L4.9 1.4c.5-.4 1.3-.2 1.6.4Z"
                   strokeLinecap="round"
@@ -79,14 +80,24 @@ export default function Contact() {
               </svg>
               0324 0146711
             </a>
-            <div style={{ display: 'flex', gap: 18, paddingTop: 4 }}>
-              <a href="https://github.com/ayanworks03" target="_blank" rel="noreferrer">
-                GitHub
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 10 }}>
+              <a href="https://github.com/ayanworks03" target="_blank" rel="noreferrer" className="social-btn" aria-label="GitHub">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 .5C5.73.5.5 5.73.5 12c0 5.09 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 2.9-.39c.98 0 1.97.13 2.9.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.69 5.41-5.25 5.69.41.36.78 1.06.78 2.15 0 1.55-.01 2.8-.01 3.18 0 .3.2.66.79.55A10.52 10.52 0 0 0 23.5 12c0-6.27-5.23-11.5-11.5-11.5Z" />
+                </svg>
               </a>
-              <a href="https://www.linkedin.com/in/ayan-works" target="_blank" rel="noreferrer">
-                LinkedIn
+              <a href="https://www.linkedin.com/in/ayan-works" target="_blank" rel="noreferrer" className="social-btn" aria-label="LinkedIn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.89 1.63-1.85 3.35-1.85 3.59 0 4.25 2.36 4.25 5.43v6.31zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z" />
+                </svg>
               </a>
-              <a href="#top">Résumé ↓</a>
+              <a
+                href="#top"
+                style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 6, fontSize: 13, color: 'var(--muted)', letterSpacing: '0.02em' }}
+              >
+                Résumé ↓
+              </a>
             </div>
           </div>
         </div>

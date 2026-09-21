@@ -32,6 +32,23 @@
   --swatch-hover-scale: 1.25;
 }
 
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  color: var(--fg);
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.social-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.08);
+}
+
 .work-card {
   transition: border-color 0.2s ease;
 }
