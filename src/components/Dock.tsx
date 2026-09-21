@@ -17,14 +17,13 @@ import {
   createContext,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type ReactElement,
   type ReactNode,
 } from 'react';
 
-const DOCK_HEIGHT = 120;
+const BASE_SIZE = 40;
 const DEFAULT_MAGNIFICATION = 84;
 const DEFAULT_DISTANCE = 150;
 const DEFAULT_PANEL_HEIGHT = 68;
@@ -60,6 +59,7 @@ type DockContextType = {
   spring: SpringOptions;
   magnification: number;
   distance: number;
+  panelHeight: number;
 };
 
 const DockContext = createContext<DockContextType | undefined>(undefined);
@@ -79,49 +79,40 @@ export function Dock({
   panelHeight = DEFAULT_PANEL_HEIGHT,
 }: DockProps) {
   const mouseX = useMotionValue(Infinity);
-  const isHovered = useMotionValue(0);
-
-  const maxHeight = useMemo(() => Math.max(DOCK_HEIGHT, magnification + magnification / 2 + 4), [magnification]);
-  const heightRow = useTransform(isHovered, [0, 1], [panelHeight, maxHeight]);
-  const height = useSpring(heightRow, spring);
 
   return (
-    <motion.div style={{ height, scrollbarWidth: 'none', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <motion.div
-        onMouseMove={({ pageX }) => {
-          isHovered.set(1);
-          mouseX.set(pageX);
-        }}
-        onMouseLeave={() => {
-          isHovered.set(0);
-          mouseX.set(Infinity);
-        }}
-        className={className}
-        style={{
-          height: panelHeight,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 18,
-          padding: '0 20px',
-          borderRadius: 999,
-          background: 'rgba(13,18,25,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          border: '1px solid var(--border-2)',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
-        }}
-        role="toolbar"
-        aria-label="Section navigation"
-      >
-        <DockContext.Provider value={{ mouseX, spring, distance, magnification }}>{children}</DockContext.Provider>
-      </motion.div>
+    <motion.div
+      onMouseMove={({ pageX }) => mouseX.set(pageX)}
+      onMouseLeave={() => mouseX.set(Infinity)}
+      className={className}
+      style={{
+        // fixed height — this panel never resizes or shifts. Items align to
+        // its top edge (see DockItem's restOffset/marginTop) so a magnified
+        // item's top stays put and only its bottom grows — it pops out from
+        // underneath the dock instead of the whole dock growing/moving.
+        height: panelHeight,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 18,
+        padding: '0 20px',
+        borderRadius: 999,
+        background: 'rgba(13,18,25,0.72)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        border: '1px solid var(--border-2)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+      }}
+      role="toolbar"
+      aria-label="Section navigation"
+    >
+      <DockContext.Provider value={{ mouseX, spring, distance, magnification, panelHeight }}>{children}</DockContext.Provider>
     </motion.div>
   );
 }
 
 export function DockItem({ children, className, onClick, href }: DockItemProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { distance, magnification, mouseX, spring } = useDock();
+  const { distance, magnification, mouseX, spring, panelHeight } = useDock();
   const isHovered = useMotionValue(0);
 
   const mouseDistance = useTransform(mouseX, (val) => {
@@ -129,8 +120,14 @@ export function DockItem({ children, className, onClick, href }: DockItemProps) 
     return val - domRect.x - domRect.width / 2;
   });
 
-  const widthTransform = useTransform(mouseDistance, [-distance, 0, distance], [40, magnification, 40]);
+  const widthTransform = useTransform(mouseDistance, [-distance, 0, distance], [BASE_SIZE, magnification, BASE_SIZE]);
   const width = useSpring(widthTransform, spring);
+
+  // The panel aligns items to its top edge (not centered) so growth only
+  // ever extends downward. This constant top margin re-centers the item
+  // at rest, within that same top-anchored flow — no per-frame offset
+  // needed, since a taller/shorter box just keeps its top fixed.
+  const restOffset = (panelHeight - BASE_SIZE) / 2;
 
   const content = Children.map(children, (child) => cloneElement(child as ReactElement, { width, isHovered } as Record<string, unknown>));
   const shared = {
@@ -138,6 +135,7 @@ export function DockItem({ children, className, onClick, href }: DockItemProps) 
     style: {
       width,
       height: width,
+      marginTop: restOffset,
       borderRadius: '50%',
       background: 'rgba(255,255,255,0.07)',
       position: 'relative',
