@@ -112,6 +112,15 @@ export function useScrollMotion(headlineRef: React.RefObject<HTMLElement | null>
         ease: 'power3.out',
         stagger: 0.012,
         scrollTrigger: { trigger: el, start: 'top 88%' },
+        // each character sits in an overflow:hidden holder so the reveal
+        // wipes up cleanly — but left permanently on, that box also clips
+        // descenders (g/y/j/p/q) forever after the animation settles.
+        // Release it once every character has finished animating in.
+        onComplete: () => {
+          chars.forEach((c) => {
+            if (c.parentElement) c.parentElement.style.overflow = 'visible';
+          });
+        },
       });
       if (tw.scrollTrigger) triggers.push(tw.scrollTrigger);
     });

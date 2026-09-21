@@ -24,24 +24,32 @@ export default function ThemeSwitcher({ theme, onChange }: { theme: Theme; onCha
           <button
             key={t}
             type="button"
+            className="theme-swatch"
             onClick={() => onChange(t)}
             aria-label={`${THEME_META[t].label} theme`}
             aria-pressed={active}
             title={THEME_META[t].label}
-            style={{
-              width: 'clamp(14px,3.4vw,18px)',
-              height: 'clamp(14px,3.4vw,18px)',
-              padding: 0,
-              borderRadius: '50%',
-              background: THEME_META[t].swatch,
-              border: active ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.5)',
-              boxShadow: active
-                ? `0 1px 4px rgba(0,0,0,0.6), 0 0 10px ${THEME_META[t].swatch}`
-                : '0 1px 4px rgba(0,0,0,0.6)',
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease, border-color 0.15s ease',
-              transform: active ? 'scale(1.08)' : 'scale(1)',
-            }}
+            style={
+              {
+                width: 'clamp(14px,3.4vw,18px)',
+                height: 'clamp(14px,3.4vw,18px)',
+                padding: 0,
+                borderRadius: '50%',
+                background: THEME_META[t].swatch,
+                border: active ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.5)',
+                boxShadow: active
+                  ? `0 1px 4px rgba(0,0,0,0.6), 0 0 10px ${THEME_META[t].swatch}`
+                  : '0 1px 4px rgba(0,0,0,0.6)',
+                cursor: 'pointer',
+                // --swatch-base is inline (this component's own active-state
+                // scale); App.css's .theme-swatch:hover bumps
+                // --swatch-hover-scale on top of it via calc(), since a
+                // plain CSS :hover{transform} rule would otherwise just be
+                // overridden by this inline style.
+                '--swatch-base': active ? 1.08 : 1,
+                transform: 'scale(calc(var(--swatch-base) * var(--swatch-hover-scale, 1)))',
+              } as React.CSSProperties
+            }
           />
         );
       })}

@@ -4,18 +4,32 @@
 
 .nav-cta {
   border: 1px solid var(--border-2);
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 .nav-cta:hover {
   border-color: var(--accent);
   color: var(--accent);
+  transform: scale(1.06);
 }
 
 .btn-accent {
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 .btn-accent:hover {
   background: var(--accent-hover);
+  transform: scale(1.06);
+}
+
+/* the theme swatches already carry their own inline transform (active-state
+   scale), so a plain CSS :hover{transform} rule would be overridden by it —
+   route the hover boost through a variable that inline transform reads
+   instead, which cascade rules DO let a stylesheet update. */
+.theme-swatch {
+  --swatch-hover-scale: 1;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.theme-swatch:hover {
+  --swatch-hover-scale: 1.25;
 }
 
 .work-card {
