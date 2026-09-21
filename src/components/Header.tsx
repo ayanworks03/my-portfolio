@@ -13,21 +13,21 @@ export default function Header() {
         padding: '22px clamp(18px,4vw,54px)',
       }}
     >
-      <a href="#top" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 500, letterSpacing: '0.04em' }}>
+      <a href="#top" style={{ fontFamily: "'Inter',sans-serif", fontSize: 15, fontWeight: 500, letterSpacing: '0.04em' }}>
         AA<span style={{ color: 'var(--accent)' }}>.</span>
       </a>
       <nav style={{ display: 'flex', alignItems: 'center', gap: 'clamp(14px,2.4vw,30px)' }}>
-        <a href="#ethos" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.16em', color: 'var(--muted)' }}>
+        <a href="#ethos" style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.16em', color: 'var(--muted)' }}>
           ETHOS
         </a>
-        <a href="#work" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.16em', color: 'var(--muted)' }}>
+        <a href="#work" style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.16em', color: 'var(--muted)' }}>
           WORK
         </a>
         <a
           href="#contact"
           className="nav-cta"
           style={{
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "'Inter',sans-serif",
             fontSize: 11,
             letterSpacing: '0.16em',
             padding: '10px 20px',

@@ -28,7 +28,7 @@ export default function Ethos() {
           }}
         />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', padding: 'clamp(16px,2vw,28px)' }}>
-          <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.2em', color: 'var(--muted-2)', textAlign: 'right', maxWidth: '22ch' }}>
+          <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.2em', color: 'var(--muted-2)', textAlign: 'right', maxWidth: '22ch' }}>
             [ FULL-BLEED PORTRAIT / WORKSPACE IMAGE — DROP YOURS HERE ]
           </span>
         </div>
@@ -40,7 +40,7 @@ export default function Ethos() {
           }}
         />
         <div style={{ position: 'relative', padding: 'clamp(24px,4vw,58px)', display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 900 }}>
-          <span data-reveal style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.22em', color: 'var(--accent)' }}>
+          <span data-reveal style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.22em', color: 'var(--accent)' }}>
             ETHOS / 01
           </span>
           <h2 data-split style={{ fontSize: 'clamp(28px,5vw,66px)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.04 }}>

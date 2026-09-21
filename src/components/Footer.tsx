@@ -11,7 +11,7 @@ export default function Footer() {
         justifyContent: 'space-between',
         gap: 14,
         flexWrap: 'wrap',
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "'Inter',sans-serif",
         fontSize: 11,
         color: 'var(--muted-3)',
       }}

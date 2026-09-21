@@ -57,13 +57,28 @@ export default function Contact() {
               gap: 16,
               borderTop: '1px solid var(--border)',
               paddingTop: 24,
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "'Inter',sans-serif",
               fontSize: 13,
               color: 'var(--muted)',
             }}
           >
-            <a href="mailto:ayan.works.03@gmail.com">ayan.works.03@gmail.com</a>
-            <a href="tel:+923240146711">0324 0146711</a>
+            <a href="mailto:ayan.works.03@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ flexShrink: 0 }}>
+                <rect x="2.5" y="5" width="19" height="14" rx="2.4" />
+                <path d="M3.5 6.5 12 13l8.5-6.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              ayan.works.03@gmail.com
+            </a>
+            <a href="tel:+923240146711" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ flexShrink: 0 }}>
+                <path
+                  d="M6.6 3.8 9.2 8.3c.3.5.2 1.1-.2 1.5L7.3 11.5c1 2.3 3 4.3 5.3 5.3l1.7-1.7c.4-.4 1-.5 1.5-.2l4.5 2.6c.6.3.8 1.1.4 1.6l-1.6 2.1c-.4.5-1 .8-1.6.8C9.9 22 2 14.1 2 4.6c0-.6.3-1.2.8-1.6L4.9 1.4c.5-.4 1.3-.2 1.6.4Z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              0324 0146711
+            </a>
             <div style={{ display: 'flex', gap: 18, paddingTop: 4 }}>
               <a href="https://github.com/ayanworks03" target="_blank" rel="noreferrer">
                 GitHub

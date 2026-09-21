@@ -21,14 +21,14 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
           <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)', display: 'block' }} />
           <span
             data-reveal
-            style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.22em', color: '#dfe4eb', textTransform: 'uppercase' }}
+            style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.22em', color: '#dfe4eb', textTransform: 'uppercase' }}
           >
             Building quietly, shipping often.
           </span>
         </div>
         <span
           data-reveal
-          style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '0.22em', color: 'var(--muted-2)', textTransform: 'uppercase' }}
+          style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, letterSpacing: '0.22em', color: 'var(--muted-2)', textTransform: 'uppercase' }}
         >
           Karachi · Remote · 2026
         </span>
@@ -40,7 +40,7 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
           <span style={{ width: 'clamp(24px,6vw,90px)', height: 1, background: 'var(--border-2)', display: 'block' }} />
           <p
             style={{
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "'Inter',sans-serif",
               fontSize: 'clamp(9px,1.05vw,13px)',
               letterSpacing: '0.34em',
               color: 'var(--accent)',
@@ -81,7 +81,7 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
                 {s.n}
               </span>
               <span
-                style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, letterSpacing: '0.16em', color: 'var(--muted-2)', lineHeight: 1.5 }}
+                style={{ fontFamily: "'Inter',sans-serif", fontSize: 10, letterSpacing: '0.16em', color: 'var(--muted-2)', lineHeight: 1.5 }}
                 dangerouslySetInnerHTML={{ __html: s.l }}
               />
             </div>
@@ -112,7 +112,7 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 22 }}>
-        <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, letterSpacing: '0.3em', color: '#c3cad3' }}>SCROLL</span>
+        <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 10, letterSpacing: '0.3em', color: '#c3cad3' }}>SCROLL</span>
       </div>
     </section>
   );

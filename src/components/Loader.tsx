@@ -97,7 +97,7 @@ export default function Loader({ onDone }: { onDone: () => void }) {
       >
         {count}
       </span>
-      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, letterSpacing: '0.32em', color: 'var(--muted-2)' }}>
+      <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 10, letterSpacing: '0.32em', color: 'var(--muted-2)' }}>
         AYAN ALI — LOADING
       </span>
       <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 2, background: 'var(--border)' }}>
