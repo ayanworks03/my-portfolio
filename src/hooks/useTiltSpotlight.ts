@@ -5,13 +5,22 @@ const MAX_TILT_DEG = 8;
 const HOVER_SCALE = 1.045; // "a little bigger" on hover
 const PERSPECTIVE = 700;
 
-// Matches Motion Primitives' Spotlight component: a small blurred circle
-// that *moves* (spring-animated left/top) rather than a full-size div whose
-// gradient coordinates get rewritten every mousemove — softer and gives the
-// glow a bit of trailing lag on fast cursor movement instead of being glued
-// exactly under it.
-const GLOW_SIZE = 320; // px
-const GLOW_BLUR = 18; // px
+// Matches Motion Primitives' Spotlight component: a blurred circle that
+// *moves* (spring-animated left/top) rather than a full-size div whose
+// gradient coordinates get rewritten every mousemove — softer, and gives
+// the glow a bit of trailing lag on fast cursor movement instead of being
+// glued exactly under it.
+//
+// Sized deliberately larger than any of the cards themselves (up to ~760px
+// wide): the glow only ever becomes visible where it overlaps the wrapper's
+// thin padding "border" gap, so a circle sized to the reference's own
+// default (200px) left a real dead zone — hovering anywhere past ~160px
+// from every edge showed literally nothing, not just faint, since the
+// circle never physically reached the border at all. Generous sizing here
+// means the border lights up no matter where within the card you're
+// hovering, not just right at the edges.
+const GLOW_SIZE = 700; // px
+const GLOW_BLUR = 24; // px
 const GLOW_SPRING = { bounce: 0 }; // matches the reference's default (critically damped, no overshoot)
 
 // tilt springiness — a bit more bounce than the glow, since it's a mass/
