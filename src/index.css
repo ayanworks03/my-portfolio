@@ -111,9 +111,13 @@ html.lenis body {
 
 /* CustomCursor only adds this class once it has confirmed a hover-capable
    pointer AND that the visitor hasn't asked for reduced motion, so this
-   rule never applies to touch devices or motion-sensitive users. */
+   rule never applies to touch devices or motion-sensitive users.
+   !important is needed here: several elements (the headline, buttons,
+   the theme swatches) set their own inline cursor style, and an inline
+   style otherwise always wins over an external stylesheet rule no
+   matter how the selector is written — the native cursor was showing
+   through on exactly those elements before this. */
 body.custom-cursor-active,
-body.custom-cursor-active a,
-body.custom-cursor-active button {
-  cursor: none;
+body.custom-cursor-active * {
+  cursor: none !important;
 }
