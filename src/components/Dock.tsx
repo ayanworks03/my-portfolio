@@ -135,7 +135,20 @@ export function DockItem({ children, className, onClick, href }: DockItemProps) 
   const content = Children.map(children, (child) => cloneElement(child as ReactElement, { width, isHovered } as Record<string, unknown>));
   const shared = {
     ref: ref as never,
-    style: { width, position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'inherit', textDecoration: 'none' } as const,
+    style: {
+      width,
+      height: width,
+      borderRadius: '50%',
+      background: 'rgba(255,255,255,0.07)',
+      position: 'relative',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      color: 'inherit',
+      textDecoration: 'none',
+      flexShrink: 0,
+    } as const,
     onHoverStart: () => isHovered.set(1),
     onHoverEnd: () => isHovered.set(0),
     onFocus: () => isHovered.set(1),

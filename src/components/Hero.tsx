@@ -46,6 +46,28 @@ const Hero = forwardRef<HTMLHeadingElement>(function Hero(_props, ref) {
           </p>
           <span style={{ width: 'clamp(24px,6vw,90px)', height: 1, background: 'var(--border-2)', display: 'block' }} />
         </div>
+
+        <a
+          data-reveal
+          href="#contact"
+          className="btn-accent"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 15,
+            fontWeight: 500,
+            padding: '14px 28px',
+            background: 'var(--accent)',
+            color: 'var(--bg)',
+            borderRadius: 999,
+          }}
+        >
+          Get in touch
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
       </div>
 
       <div
