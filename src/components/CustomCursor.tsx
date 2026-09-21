@@ -5,11 +5,11 @@ import { readAccentRgb } from '../lib/readAccentRgb';
 // drifts outward, fading as it goes — each particle is drawn as a line
 // from its previous frame's position to its current one, which is what
 // gives them that streaked/dash look instead of plain dots.
-const SPAWN_INTERVAL_MS = 12; // ~one burst per frame while the pointer is moving
-const PARTICLES_PER_SPAWN = 3;
+const SPAWN_INTERVAL_MS = 55; // sparse — only spawns every few frames, not on every move
+const PARTICLES_PER_SPAWN = 1;
 const HOVER_SPAWN_MULTIPLIER = 2; // denser field over links/buttons, as a hover cue
-const CLICK_BURST_COUNT = 18;
-const PARTICLE_LIFETIME_MS = 1000;
+const CLICK_BURST_COUNT = 6;
+const PARTICLE_LIFETIME_MS = 700;
 const SPAWN_RADIUS = 10; // px offset from the exact cursor point
 const INITIAL_SPEED = 0.4; // px/ms
 const FRICTION = 0.965; // per-frame velocity decay
