@@ -12,9 +12,17 @@ const EDGE_SOFTNESS = 70 * CANVAS_SCALE; // canvas px width of the soft transiti
 const RADIUS_NOISE_AMOUNT = 0.55; // how much the boundary bulges/recedes (fraction of BASE_RADIUS)
 const AMBIENT_REVEAL = 0.1; // baseline visibility with the spotlight far away
 
+// The reveal follows a short trail of recent positions rather than a single
+// lagging point — moving fast stretches it into a wake behind the cursor,
+// like something dragging through water; holding still collapses it back
+// to one spot. TRAIL_LENGTH must match the shader's fixed-size array.
+const TRAIL_LENGTH = 10;
+const TRAIL_RADIUS_FALLOFF = 0.65; // how much smaller the oldest trail point's circle is
+const TRAIL_WEIGHT_FALLOFF = 1.0; // how much fainter the oldest trail point is (1 = fades to 0)
+
 const FRAGMENT_SHADER = `
 precision mediump float;
-uniform float uTime; uniform vec2 uRes; uniform vec2 uFocal; uniform vec3 uAccent;
+uniform float uTime; uniform vec2 uRes; uniform vec2 uTrail[${TRAIL_LENGTH}]; uniform vec3 uAccent;
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
   return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x), u.y); }
@@ -44,9 +52,21 @@ void main(){
   // organic, slowly-drifting distortion of the reveal boundary so it reads
   // as smoke pulling back rather than a compass-drawn circle.
   float edgeNoise = fbmEdge(gl_FragCoord.xy * 0.012 + vec2(uTime*0.12, -uTime*0.09));
-  float effectiveRadius = ${BASE_RADIUS.toFixed(2)} * (1.0 - ${RADIUS_NOISE_AMOUNT.toFixed(2)} * 0.5 + ${RADIUS_NOISE_AMOUNT.toFixed(2)} * edgeNoise);
-  float d = distance(gl_FragCoord.xy, uFocal);
-  float reveal = 1.0 - smoothstep(effectiveRadius - ${EDGE_SOFTNESS.toFixed(2)}, effectiveRadius + ${EDGE_SOFTNESS.toFixed(2)}, d);
+  float noiseFactor = 1.0 - ${RADIUS_NOISE_AMOUNT.toFixed(2)} * 0.5 + ${RADIUS_NOISE_AMOUNT.toFixed(2)} * edgeNoise;
+
+  // union of a shrinking, fading circle at each recent position — moving
+  // fast spreads these apart into a tapering wake; standing still collapses
+  // them onto the same spot, back into a single circle.
+  float reveal = 0.0;
+  for (int i = 0; i < ${TRAIL_LENGTH}; i++) {
+    float fi = float(i);
+    float radiusFactor = 1.0 - fi / ${(TRAIL_LENGTH - 1).toFixed(1)} * ${TRAIL_RADIUS_FALLOFF.toFixed(2)};
+    float weight = 1.0 - fi / ${(TRAIL_LENGTH - 1).toFixed(1)} * ${TRAIL_WEIGHT_FALLOFF.toFixed(2)};
+    float effectiveRadius = ${BASE_RADIUS.toFixed(2)} * radiusFactor * noiseFactor;
+    float d = distance(gl_FragCoord.xy, uTrail[i]);
+    float point = (1.0 - smoothstep(effectiveRadius - ${EDGE_SOFTNESS.toFixed(2)}, effectiveRadius + ${EDGE_SOFTNESS.toFixed(2)}, d)) * weight;
+    reveal = max(reveal, point);
+  }
   reveal = max(reveal, ${AMBIENT_REVEAL.toFixed(3)});
 
   vec3 dark = vec3(0.027,0.035,0.047);
@@ -108,10 +128,11 @@ export default function SmokeField({ theme }: { theme: Theme }) {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const [ar, ag, ab] = readAccentRgb();
+    const trail = Array.from({ length: TRAIL_LENGTH }, () => new THREE.Vector2(0, 0));
     const uniforms = {
       uTime: { value: 0 },
       uRes: { value: new THREE.Vector2(1, 1) },
-      uFocal: { value: new THREE.Vector2(0, 0) },
+      uTrail: { value: trail },
       uAccent: { value: new THREE.Vector3(ar, ag, ab) },
     };
     accentUniformRef.current = uniforms.uAccent;
@@ -129,6 +150,9 @@ export default function SmokeField({ theme }: { theme: Theme }) {
     let sx = px;
     let sy = py;
     let active = false;
+    // seed the trail at the idle position so it doesn't streak in from the
+    // canvas origin over its first few frames.
+    for (const t of trail) t.set(sx * CANVAS_SCALE, (window.innerHeight - sy) * CANVAS_SCALE);
 
     const onMove = (e: PointerEvent) => {
       px = e.clientX;
@@ -170,8 +194,10 @@ export default function SmokeField({ theme }: { theme: Theme }) {
       sx += (px - sx) * follow;
       sy += (py - sy) * follow;
 
+      // shift the trail back and drop the smoothed position in at the front —
       // convert CSS/viewport pixels to the renderer's half-res, bottom-origin canvas space
-      uniforms.uFocal.value.set(sx * CANVAS_SCALE, (window.innerHeight - sy) * CANVAS_SCALE);
+      for (let i = TRAIL_LENGTH - 1; i > 0; i--) trail[i].copy(trail[i - 1]);
+      trail[0].set(sx * CANVAS_SCALE, (window.innerHeight - sy) * CANVAS_SCALE);
 
       if (now - last < FRAME) return;
       last = now;

@@ -13,6 +13,10 @@ const SPAWN_RADIUS = 10; // px offset from the exact cursor point
 const INITIAL_SPEED = 0.4; // px/ms
 const FRICTION = 0.965; // per-frame velocity decay
 
+const RING_FOLLOW = 0.25; // per-frame interpolation toward the raw pointer position
+const RING_RADIUS = 10;
+const RING_HOVER_SCALE = 1.9;
+
 type Particle = {
   x: number;
   y: number;
@@ -48,6 +52,10 @@ export default function CustomCursor() {
     let lastSpawn = 0;
     let mx = window.innerWidth / 2;
     let my = window.innerHeight / 2;
+    let ringX = mx;
+    let ringY = my;
+    let ringScale = 1;
+    let targetRingScale = 1;
     let hovering = false;
     const particles: Particle[] = [];
 
@@ -76,6 +84,7 @@ export default function CustomCursor() {
       my = e.clientY;
       const el = e.target;
       hovering = el instanceof Element && !!el.closest('a, button, input, textarea');
+      targetRingScale = hovering ? RING_HOVER_SCALE : 1;
       const now = performance.now();
       if (now - lastSpawn > SPAWN_INTERVAL_MS) {
         lastSpawn = now;
@@ -88,8 +97,13 @@ export default function CustomCursor() {
     const onDown = () => {
       const now = performance.now();
       for (let i = 0; i < CLICK_BURST_COUNT; i++) spawnOne(now);
+      targetRingScale *= 0.8;
     };
     window.addEventListener('pointerdown', onDown, { passive: true });
+    const onUp = () => {
+      targetRingScale = hovering ? RING_HOVER_SCALE : 1;
+    };
+    window.addEventListener('pointerup', onUp, { passive: true });
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
@@ -123,6 +137,18 @@ export default function CustomCursor() {
         ctx.lineTo(p.x, p.y);
         ctx.stroke();
       }
+
+      ringX += (mx - ringX) * RING_FOLLOW;
+      ringY += (my - ringY) * RING_FOLLOW;
+      ringScale += (targetRingScale - ringScale) * 0.2;
+      const r = RING_RADIUS * ringScale;
+      ctx.beginPath();
+      ctx.arc(ringX, ringY, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${accentRgb}, 0.12)`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${accentRgb}, 0.9)`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     };
     raf = requestAnimationFrame(tick);
 
@@ -132,6 +158,7 @@ export default function CustomCursor() {
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointerup', onUp);
       window.removeEventListener('resize', resize);
     };
   }, []);
