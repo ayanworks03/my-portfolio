@@ -50,9 +50,19 @@
   transform: scale(1.08);
 }
 
+/* oval variant for a text label (Résumé) instead of a single icon —
+   same height/border/hover treatment as .social-btn, just auto-width
+   with side padding so the fixed circle becomes a pill. */
+.social-btn--pill {
+  width: auto;
+  padding: 0 16px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
 /* same zoom + highlight treatment as .social-btn, but for inline text
-   links (phone/mail/résumé) that carry their own padding instead of
-   being a fixed-size circle. */
+   links (phone/mail) that carry their own padding instead of being a
+   fixed-size circle or pill. */
 .contact-link {
   display: inline-block;
   margin: -4px -8px;
