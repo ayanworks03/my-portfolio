@@ -152,68 +152,74 @@ export default function Contact() {
         </div>
       </div>
 
-      <form
-        data-reveal
-        onSubmit={(e) => {
-          e.preventDefault();
-          setSent(true);
-        }}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 20,
-          maxWidth: 640,
-          border: '1px solid var(--border)',
-          borderRadius: 6,
-          padding: 'clamp(20px,2.6vw,38px)',
-          background: 'rgba(13,18,25,0.7)',
-        }}
-      >
-        <label htmlFor="contact-name" style={SR_ONLY}>
-          Name
-        </label>
-        <input id="contact-name" name="name" type="text" placeholder="Name" className="field-input" style={FIELD} required />
-
-        <label htmlFor="contact-email" style={SR_ONLY}>
-          E-mail
-        </label>
-        <input id="contact-email" name="email" type="email" placeholder="E-mail" className="field-input" style={FIELD} required />
-
-        <label htmlFor="contact-budget" style={SR_ONLY}>
-          Budget / timeline
-        </label>
-        <input id="contact-budget" name="budget" type="text" placeholder="Budget / timeline" className="field-input" style={FIELD} />
-
-        <label htmlFor="contact-message" style={SR_ONLY}>
-          What are you building?
-        </label>
-        <textarea
-          id="contact-message"
-          name="message"
-          rows={4}
-          placeholder="What are you building?"
-          className="field-input"
-          style={{ ...FIELD, resize: 'vertical' }}
-          required
-        />
-        <button
-          type="submit"
-          className="btn-accent"
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 'clamp(28px,4vw,64px)', alignItems: 'center' }}>
+        <form
+          data-reveal
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSent(true);
+          }}
           style={{
-            alignSelf: 'flex-start',
-            fontSize: 15,
-            fontWeight: 500,
-            padding: '14px 30px',
-            background: 'var(--accent)',
-            color: 'var(--bg)',
-            border: 0,
-            borderRadius: 999,
-            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+            maxWidth: 640,
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            padding: 'clamp(20px,2.6vw,38px)',
+            background: 'rgba(13,18,25,0.7)',
           }}
         >
-          {sent ? 'Sent ✓' : 'Send message →'}
-        </button>
-      </form>
+          <label htmlFor="contact-name" style={SR_ONLY}>
+            Name
+          </label>
+          <input id="contact-name" name="name" type="text" placeholder="Name" className="field-input" style={FIELD} required />
+
+          <label htmlFor="contact-email" style={SR_ONLY}>
+            E-mail
+          </label>
+          <input id="contact-email" name="email" type="email" placeholder="E-mail" className="field-input" style={FIELD} required />
+
+          <label htmlFor="contact-message" style={SR_ONLY}>
+            What are you building?
+          </label>
+          <textarea
+            id="contact-message"
+            name="message"
+            rows={4}
+            placeholder="What are you building?"
+            className="field-input"
+            style={{ ...FIELD, resize: 'vertical' }}
+            required
+          />
+          <button
+            type="submit"
+            className="btn-accent"
+            style={{
+              alignSelf: 'flex-start',
+              fontSize: 15,
+              fontWeight: 500,
+              padding: '14px 30px',
+              background: 'var(--accent)',
+              color: 'var(--bg)',
+              border: 0,
+              borderRadius: 999,
+              cursor: 'pointer',
+            }}
+          >
+            {sent ? 'Sent ✓' : 'Send message →'}
+          </button>
+        </form>
+
+        <div data-reveal style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <h3 style={{ fontFamily: "'Poppins',Helvetica,Arial,sans-serif", fontSize: 'clamp(26px,3.4vw,42px)', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+            Let's start the conversation.
+          </h3>
+          <p style={{ color: 'var(--muted)', fontSize: 15, lineHeight: 1.75, maxWidth: '38ch' }}>
+            A few lines about what you're building is enough to start — I'll read it myself and reply with real next steps, not a template.
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
