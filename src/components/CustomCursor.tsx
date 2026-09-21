@@ -94,7 +94,14 @@ export default function CustomCursor() {
     };
     window.addEventListener('pointermove', onMove, { passive: true });
 
-    const onDown = () => {
+    const onDown = (e: PointerEvent) => {
+      // snap the ring to the exact click point instead of wherever its
+      // lagging/smoothed position currently is, so it's never visibly
+      // offset from where the click actually lands.
+      mx = e.clientX;
+      my = e.clientY;
+      ringX = mx;
+      ringY = my;
       const now = performance.now();
       for (let i = 0; i < CLICK_BURST_COUNT; i++) spawnOne(now);
       targetRingScale *= 0.8;
