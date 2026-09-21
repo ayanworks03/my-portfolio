@@ -41,12 +41,31 @@
   border-radius: 999px;
   border: 1px solid var(--border-2);
   color: var(--fg);
-  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 .social-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.12);
   transform: scale(1.08);
+}
+
+/* same zoom + highlight treatment as .social-btn, but for inline text
+   links (phone/mail/résumé) that carry their own padding instead of
+   being a fixed-size circle. */
+.contact-link {
+  display: inline-block;
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--muted);
+  line-height: 1.7;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+.contact-link:hover {
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.12);
+  transform: scale(1.05);
 }
 
 .marquee-track {
@@ -80,10 +99,15 @@
 }
 
 .field-input {
-  transition: border-bottom-color 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.field-input:hover {
+  border-color: var(--border-3) !important;
 }
 .field-input:focus {
-  border-bottom-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
 }
 
 @media (max-width: 700px) {

@@ -1,16 +1,16 @@
 import { useState } from 'react';
 
 const FIELD: React.CSSProperties = {
-  background: 'transparent',
-  border: 0,
-  borderBottom: '1px solid #222a35',
+  background: 'rgba(255,255,255,0.03)',
+  border: '1px solid var(--border-2)',
+  borderRadius: 8,
   color: 'var(--fg)',
   fontSize: 15,
-  padding: '12px 2px',
+  padding: '14px 16px',
   // no outline:none here — that would defeat index.css's :focus-visible
   // ring (an inline style always wins over an external stylesheet rule),
-  // leaving keyboard users with only the underline-color change as
-  // feedback.
+  // leaving keyboard users with only the border/glow change from
+  // .field-input:focus in App.css as feedback.
 };
 
 // Visually identical to having no label (placeholder still carries the
@@ -101,7 +101,7 @@ export default function Contact() {
               </svg>
             }
           >
-            <a href="tel:+923240146711" style={{ ...ROW_VALUE, display: 'block' }}>
+            <a href="tel:+923240146711" className="contact-link" style={{ fontSize: 14 }}>
               0324 0146711
             </a>
           </InfoRow>
@@ -115,7 +115,7 @@ export default function Contact() {
               </svg>
             }
           >
-            <a href="mailto:ayan.works.03@gmail.com" style={{ ...ROW_VALUE, display: 'block' }}>
+            <a href="mailto:ayan.works.03@gmail.com" className="contact-link" style={{ fontSize: 14 }}>
               ayan.works.03@gmail.com
             </a>
           </InfoRow>
@@ -144,7 +144,7 @@ export default function Contact() {
                   <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.89 1.63-1.85 3.35-1.85 3.59 0 4.25 2.36 4.25 5.43v6.31zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z" />
                 </svg>
               </a>
-              <a href="#top" style={{ ...ROW_VALUE, marginLeft: 4 }}>
+              <a href="#top" className="contact-link" style={{ fontSize: 14 }}>
                 Résumé ↓
               </a>
             </div>
