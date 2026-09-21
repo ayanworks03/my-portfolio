@@ -10,20 +10,13 @@ const WRAP_RADIUS = 7;
 const BORDER_PAD = 1.5;
 const wrapStyle = (wide: boolean): React.CSSProperties => ({
   position: 'relative',
+  overflow: 'hidden', // clips the glow circle to the wrapper's rounded rect
   borderRadius: WRAP_RADIUS,
   padding: BORDER_PAD,
   background: 'var(--border)',
   minWidth: 0,
   gridColumn: wide ? 'span 2' : undefined,
 });
-const glowStyle: React.CSSProperties = {
-  position: 'absolute',
-  inset: 0,
-  borderRadius: WRAP_RADIUS,
-  opacity: 0,
-  transition: 'opacity 0.35s ease',
-  pointerEvents: 'none',
-};
 const CARD: React.CSSProperties = {
   position: 'relative',
   zIndex: 1,
@@ -57,7 +50,7 @@ export default function Work() {
 
       <div className="work-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,330px),1fr))', gap: 'clamp(14px,1.8vw,24px)' }}>
         <div data-reveal className="work-card work-card--wide" ref={tilt1.wrapRef} onMouseMove={tilt1.onMouseMove} onMouseLeave={tilt1.onMouseLeave} style={wrapStyle(true)}>
-          <div ref={tilt1.glowRef} style={glowStyle} />
+          <motion.div ref={tilt1.glowRef} style={tilt1.glowStyle} />
           <motion.a href="#contact" style={{ ...CARD, ...tilt1.style, background: 'linear-gradient(135deg,#10161f,#0a0e14)' }}>
             <div
               style={{
@@ -87,7 +80,7 @@ export default function Work() {
         </div>
 
         <div data-reveal className="work-card" ref={tilt2.wrapRef} onMouseMove={tilt2.onMouseMove} onMouseLeave={tilt2.onMouseLeave} style={wrapStyle(false)}>
-          <div ref={tilt2.glowRef} style={glowStyle} />
+          <motion.div ref={tilt2.glowRef} style={tilt2.glowStyle} />
           <motion.a href="#contact" style={{ ...CARD, ...tilt2.style, background: 'var(--card-bg)' }}>
             <div
               style={{
@@ -116,7 +109,7 @@ export default function Work() {
         </div>
 
         <div data-reveal className="work-card" ref={tilt3.wrapRef} onMouseMove={tilt3.onMouseMove} onMouseLeave={tilt3.onMouseLeave} style={wrapStyle(false)}>
-          <div ref={tilt3.glowRef} style={glowStyle} />
+          <motion.div ref={tilt3.glowRef} style={tilt3.glowStyle} />
           <motion.a href="#contact" style={{ ...CARD, ...tilt3.style, background: 'var(--card-bg)' }}>
             <div
               style={{
@@ -146,7 +139,7 @@ export default function Work() {
         </div>
 
         <div data-reveal className="work-card work-card--wide" ref={tilt4.wrapRef} onMouseMove={tilt4.onMouseMove} onMouseLeave={tilt4.onMouseLeave} style={wrapStyle(true)}>
-          <div ref={tilt4.glowRef} style={glowStyle} />
+          <motion.div ref={tilt4.glowRef} style={tilt4.glowStyle} />
           <motion.a
             href="#contact"
             style={{ ...CARD, ...tilt4.style, background: 'var(--card-bg)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,260px),1fr))' }}
