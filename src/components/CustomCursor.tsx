@@ -6,7 +6,7 @@ import { readAccentRgb } from '../lib/readAccentRgb';
 // from its previous frame's position to its current one, which is what
 // gives them that streaked/dash look instead of plain dots.
 const SPAWN_INTERVAL_MS = 55; // sparse — only spawns every few frames, not on every move
-const PARTICLES_PER_SPAWN = 1;
+const PARTICLES_PER_SPAWN = 2;
 const HOVER_SPAWN_MULTIPLIER = 2; // denser field over links/buttons, as a hover cue
 const CLICK_BURST_COUNT = 6;
 const PARTICLE_LIFETIME_MS = 700;
