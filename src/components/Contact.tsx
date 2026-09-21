@@ -62,12 +62,15 @@ export default function Contact() {
               color: 'var(--muted)',
             }}
           >
-            <span>your@email.com</span>
-            <span>+00 000 000 0000</span>
-            <span>City, Country · remote friendly</span>
+            <a href="mailto:ayan.works.03@gmail.com">ayan.works.03@gmail.com</a>
+            <a href="tel:+923240146711">0324 0146711</a>
             <div style={{ display: 'flex', gap: 18, paddingTop: 4 }}>
-              <a href="#top">GitHub</a>
-              <a href="#top">LinkedIn</a>
+              <a href="https://github.com/ayanworks03" target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+              <a href="https://www.linkedin.com/in/ayan-works" target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
               <a href="#top">Résumé ↓</a>
             </div>
           </div>
