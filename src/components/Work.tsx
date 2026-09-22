@@ -183,6 +183,30 @@ export default function Work() {
           </div>
         </motion.a>
       </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(32px,5vh,56px)' }}>
+        <a
+          href="https://github.com/ayanworks03"
+          target="_blank"
+          rel="noreferrer"
+          className="nav-cta"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 13,
+            letterSpacing: '0.04em',
+            padding: '12px 24px',
+            borderRadius: 999,
+            color: 'var(--fg)',
+          }}
+        >
+          View all projects on GitHub
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M7 17 17 7M8 7h9v9" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
+      </div>
     </section>
   );
 }
